@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Дарья Плотникова](https://up.htmlacademy.ru/ecmascript/8/user/574945).
-* Наставник: `Неизвестно`.
+* Наставник: [Руфат Хасларов](https://htmlacademy.ru/profile/id372587).
 
 ---
 
