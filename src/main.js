@@ -4,7 +4,7 @@ import {getRandomInt, renderElements, getNewListTripPoints} from './utils.js';
 import {createFilter} from './template-filter.js';
 import {createTripPoint} from './template-trip-point.js';
 
-const NUMBER_TRIP_POINTS_ON_PAGE = 4;
+const NUMBER_TRIP_POINTS_ON_PAGE = 7;
 const MAX_TRIP_POINTS = 10;
 
 const filtersContainer = document.querySelector(`.trip-filter`);

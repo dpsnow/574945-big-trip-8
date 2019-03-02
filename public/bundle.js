@@ -97,7 +97,6 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filters", function() { return filters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tripPoints", function() { return tripPoints; });
-
 const filters = [
   {name: `Everything`, checked: true},
   {name: `Future`},
@@ -196,8 +195,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const NUMBER_TRIP_POINTS_ON_PAGE = 4;
-const MAX_TRIP_POINT = 10;
+const NUMBER_TRIP_POINTS_ON_PAGE = 7;
+const MAX_TRIP_POINTS = 10;
 
 const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointContainer = document.querySelector(`.trip-day__items`);
@@ -210,7 +209,7 @@ const init = () => {
   filtersContainer.addEventListener(`click`, (evt) => {
     if (evt.target.nodeName === `INPUT`) {
       tripPointContainer.innerHTML = ``;
-      const newQuantityTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getRandomInt"])(1, MAX_TRIP_POINT);
+      const newQuantityTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getRandomInt"])(1, MAX_TRIP_POINTS);
       const randomTripPoints = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(newQuantityTripPoint, _data_js__WEBPACK_IMPORTED_MODULE_0__["tripPoints"]);
       Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(tripPointContainer, randomTripPoints, _template_trip_point_js__WEBPACK_IMPORTED_MODULE_3__["createTripPoint"]);
     }
