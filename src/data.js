@@ -1,11 +1,10 @@
-
-const listFilter = [
+const filters = [
   {name: `Everything`, checked: true},
   {name: `Future`},
   {name: `Past`}
 ];
 
-const listTripPoint = [
+const tripPoints = [
   {
     icon: `🚕`,
     title: `Taxi to Airport`,
@@ -73,4 +72,4 @@ const listTripPoint = [
 ];
 
 
-export {listFilter, listTripPoint};
+export {filters, tripPoints};

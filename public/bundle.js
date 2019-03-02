@@ -90,21 +90,21 @@
 /*!*********************!*\
   !*** ./src/data.js ***!
   \*********************/
-/*! exports provided: listFilter, listTripPoint */
+/*! exports provided: filters, tripPoints */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "listFilter", function() { return listFilter; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "listTripPoint", function() { return listTripPoint; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filters", function() { return filters; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tripPoints", function() { return tripPoints; });
 
-const listFilter = [
+const filters = [
   {name: `Everything`, checked: true},
   {name: `Future`},
   {name: `Past`}
 ];
 
-const listTripPoint = [
+const tripPoints = [
   {
     icon: `🚕`,
     title: `Taxi to Airport`,
@@ -188,49 +188,31 @@ const listTripPoint = [
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _data_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./data.js */ "./src/data.js");
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/* harmony import */ var _templateFilter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./templateFilter.js */ "./src/templateFilter.js");
-/* harmony import */ var _templateTripPoint_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./templateTripPoint.js */ "./src/templateTripPoint.js");
+/* harmony import */ var _template_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./template-filter.js */ "./src/template-filter.js");
+/* harmony import */ var _template_trip_point_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./template-trip-point.js */ "./src/template-trip-point.js");
 
 
 
 
 
 
-const COUNT_TRIP_POINT_FIRST = 4;
+const NUMBER_TRIP_POINTS_ON_PAGE = 4;
 const MAX_TRIP_POINT = 10;
 
 const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointContainer = document.querySelector(`.trip-day__items`);
 
-const renderFilters = (container, parametrsFilters) => {
-  const fragment = document.createDocumentFragment();
-  const filters = parametrsFilters.map(_templateFilter_js__WEBPACK_IMPORTED_MODULE_2__["createFilter"]);
-  filters.forEach((element) => {
-    Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["insertHtmlToElement"])(element, fragment);
-  });
-  container.appendChild(fragment);
-};
-
-const renderTripPoint = (container, parametrsTripPoint) => {
-  const fragment = document.createDocumentFragment();
-  const tripPoints = parametrsTripPoint.map(_templateTripPoint_js__WEBPACK_IMPORTED_MODULE_3__["createTripPoint"]);
-  tripPoints.forEach((element) => {
-    Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["insertHtmlToElement"])(element, fragment);
-  });
-  container.appendChild(fragment);
-};
-
 const init = () => {
-  const firstTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(COUNT_TRIP_POINT_FIRST, _data_js__WEBPACK_IMPORTED_MODULE_0__["listTripPoint"]);
-  renderFilters(filtersContainer, _data_js__WEBPACK_IMPORTED_MODULE_0__["listFilter"]);
-  renderTripPoint(tripPointContainer, firstTripPoint);
+  const firstTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(NUMBER_TRIP_POINTS_ON_PAGE, _data_js__WEBPACK_IMPORTED_MODULE_0__["tripPoints"]);
+  Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(filtersContainer, _data_js__WEBPACK_IMPORTED_MODULE_0__["filters"], _template_filter_js__WEBPACK_IMPORTED_MODULE_2__["createFilter"]);
+  Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(tripPointContainer, firstTripPoint, _template_trip_point_js__WEBPACK_IMPORTED_MODULE_3__["createTripPoint"]);
 
   filtersContainer.addEventListener(`click`, (evt) => {
     if (evt.target.nodeName === `INPUT`) {
       tripPointContainer.innerHTML = ``;
-      const newCounttripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getRandomInt"])(1, MAX_TRIP_POINT);
-      const randomTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(newCounttripPoint, _data_js__WEBPACK_IMPORTED_MODULE_0__["listTripPoint"]);
-      renderTripPoint(tripPointContainer, randomTripPoint);
+      const newQuantityTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getRandomInt"])(1, MAX_TRIP_POINT);
+      const randomTripPoints = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(newQuantityTripPoint, _data_js__WEBPACK_IMPORTED_MODULE_0__["tripPoints"]);
+      Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(tripPointContainer, randomTripPoints, _template_trip_point_js__WEBPACK_IMPORTED_MODULE_3__["createTripPoint"]);
     }
   });
 };
@@ -240,10 +222,10 @@ init();
 
 /***/ }),
 
-/***/ "./src/templateFilter.js":
-/*!*******************************!*\
-  !*** ./src/templateFilter.js ***!
-  \*******************************/
+/***/ "./src/template-filter.js":
+/*!********************************!*\
+  !*** ./src/template-filter.js ***!
+  \********************************/
 /*! exports provided: createFilter */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -267,10 +249,10 @@ function createFilter(filterParam) {
 
 /***/ }),
 
-/***/ "./src/templateTripPoint.js":
-/*!**********************************!*\
-  !*** ./src/templateTripPoint.js ***!
-  \**********************************/
+/***/ "./src/template-trip-point.js":
+/*!************************************!*\
+  !*** ./src/template-trip-point.js ***!
+  \************************************/
 /*! exports provided: createTripPoint */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -309,18 +291,31 @@ function createTripPoint(tripPointParam) {
 /*!**********************!*\
   !*** ./src/utils.js ***!
   \**********************/
-/*! exports provided: getRandomInt, insertHtmlToElement, getNewListTripPoints */
+/*! exports provided: getRandomInt, renderElements, getNewListTripPoints */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandomInt", function() { return getRandomInt; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "insertHtmlToElement", function() { return insertHtmlToElement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderElements", function() { return renderElements; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewListTripPoints", function() { return getNewListTripPoints; });
 const parser = new DOMParser();
 
+/**
+ * Возвращает случайное целое число из заданного диапазона
+ *
+ * @param {Number} min - минимально возможное значение
+ * @param {Number} max - максимально возможное значение
+ * @return {Number}
+ */
 const getRandomInt = (min, max) => Math.floor(Math.random() * Math.floor((max - min) + 1) + min);
 
+/**
+ * Переобразовывает HTML код элемента в DOM узлы
+ *
+ * @param {Sring} html - строка содержащая HTML
+ * @param {Node} container - DOM-элемент для отрисовки
+ */
 const insertHtmlToElement = (html, container) => {
   const element = parser.parseFromString(html, `text/html`);
   const cardChildren = element.body.childNodes;
@@ -328,19 +323,34 @@ const insertHtmlToElement = (html, container) => {
 };
 
 /**
- * Возвращает случаные собития маршрита нужного количества
+ * Добавляет на страницу созданые из шаблона элементы
  *
- * @param {Number} count - новое количество
+ * @param {Node} container - DOM-элемент для отрисовки
+ * @param {Array} elements - список элементов с параметрами
+ * @param {Function} createElementHtml - функция изменения шаблона элемента на основе параметров
+ */
+const renderElements = (container, elements, createElementHtml) => {
+  const fragment = document.createDocumentFragment();
+  const elementsHtml = elements.map(createElementHtml);
+  elementsHtml.forEach((element) => {
+    insertHtmlToElement(element, fragment);
+  });
+  container.appendChild(fragment);
+};
+
+/**
+ * Возвращает случаные события маршрута заданного количества
+ *
+ * @param {Number} quantity - новое количество
  * @param {Array} arrayTripPoint - исходный массив событий
  * @return {Array} новый массив событий
  */
-const getNewListTripPoints = (count, arrayTripPoint) => {
+const getNewListTripPoints = (quantity, arrayTripPoint) => {
   const newArrayTripPoint = [];
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < quantity; i++) {
     const j = getRandomInt(0, arrayTripPoint.length - 1);
     newArrayTripPoint.push(arrayTripPoint[j]);
   }
-
   return newArrayTripPoint;
 };
 
