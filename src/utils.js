@@ -41,16 +41,13 @@ const renderElements = (container, elements, createElementHtml) => {
  * Возвращает случаные события маршрута заданного количества
  *
  * @param {Number} quantity - новое количество
- * @param {Array} arrayTripPoint - исходный массив событий
+ * @param {Function} getTripPoint - функция возвращающая объект с данными для собитий маршрута
  * @return {Array} новый массив событий
  */
-const getNewListTripPoints = (quantity, arrayTripPoint) => {
-  const newArrayTripPoint = [];
-  for (let i = 0; i < quantity; i++) {
-    const j = getRandomInt(0, arrayTripPoint.length - 1);
-    newArrayTripPoint.push(arrayTripPoint[j]);
-  }
-  return newArrayTripPoint;
+const getNewListTripPoints = (quantity, getTripPoint) => {
+  return new Array(quantity).fill(``).map(()=>{
+    return getTripPoint();
+  });
 };
 
 export {getRandomInt, renderElements, getNewListTripPoints};
