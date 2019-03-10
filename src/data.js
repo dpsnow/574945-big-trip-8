@@ -1,6 +1,6 @@
-import {getRandomInt, getRandomValueFromArray, getRandomArray} from './utils.js';
+import {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray} from './utils.js';
 
-const filters = [
+const filtersData = [
   {name: `Everything`, checked: true},
   {name: `Future`},
   {name: `Past`}
@@ -27,7 +27,7 @@ const allOffers = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose
 
 const getOffers = () => {
   let offers = [];
-  let offersName = getRandomArray(allOffers, 2);
+  let offersName = getRandomArray(allOffers, 3);
   offersName = new Set(offersName);
   offersName.forEach((offerName) => {
     offers.push({
@@ -55,7 +55,7 @@ const getRandomTimeParams = () => {
 };
 
 
-const getTripPoint = () => {
+const tripPointData = () => {
   const timeParams = getRandomTimeParams();
 
   return {
@@ -67,8 +67,10 @@ const getTripPoint = () => {
     duration: timeParams.duration,
     price: getRandomInt(15, 250),
     offers: getOffers(),
-    description: new Set(getRandomArray(descriptionText, 4, 1)),
+    picture: `http://picsum.photos/150/150?r=${getRandomInt(0, 155)}`,
+    description: [...new Set(getRandomArray(descriptionText, 4, 1))].join(``),
+    isFavorite: getRandomBoolean()
   };
 };
 
-export {filters, typeTripPoint, getTripPoint};
+export {filtersData, typeTripPoint, tripPointData};
