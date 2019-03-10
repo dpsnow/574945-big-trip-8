@@ -1,4 +1,4 @@
-import {getRandomInt} from './utils.js';
+import {getRandomInt, getRandomValueFromArray, getRandomArray} from './utils.js';
 
 const filters = [
   {name: `Everything`, checked: true},
@@ -6,7 +6,7 @@ const filters = [
   {name: `Past`}
 ];
 
-const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`.split(`. `);
+const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`.split(`. `);
 
 const cities = [`Geneva`, `Amsterdam`, `Chamonix`, `Moscow`, `Berlin`, `Milan`, `Rome`, `Paris`, `Lisbon`];
 
@@ -27,7 +27,7 @@ const allOffers = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose
 
 const getOffers = () => {
   let offers = [];
-  let offersName = new Array(getRandomInt(0, 2)).fill(``).map(() => allOffers[getRandomInt(0, allOffers.length - 1)]);
+  let offersName = getRandomArray(allOffers, 2);
   offersName = new Set(offersName);
   offersName.forEach((offerName) => {
     offers.push({
@@ -47,6 +47,7 @@ const getRandomTimeParams = () => {
   timeEnd.setHours(getRandomInt(startTime.getHours(), 23), getRandomInt(startTime.getMinutes(), 59));
 
   return {
+    day: startTime.getTime(),
     timeStart: startTime.getTime(),
     timeEnd: timeEnd.getTime(),
     duration: `${timeEnd.getHours() - startTime.getHours()}h ${timeEnd.getMinutes() - startTime.getMinutes()}m`
@@ -58,15 +59,15 @@ const getTripPoint = () => {
   const timeParams = getRandomTimeParams();
 
   return {
-    type: Object.keys(typeTripPoint)[Math.floor(Math.random() * Object.keys(typeTripPoint).length)],
-    destination: cities[Math.floor(Math.random() * cities.length)],
-    day: new Date().setDate(new Date().getDate() + Math.floor(Math.random() * 4)),
+    type: getRandomValueFromArray(Object.keys(typeTripPoint)),
+    destination: getRandomValueFromArray(cities),
+    day: timeParams.day,
     timeStart: timeParams.timeStart,
     timeEnd: timeParams.timeEnd,
     duration: timeParams.duration,
     price: getRandomInt(15, 250),
     offers: getOffers(),
-    description: new Set(new Array(getRandomInt(1, 4)).fill(``).map(() => description[getRandomInt(0, allOffers.length - 1)])),
+    description: new Set(getRandomArray(descriptionText, 4, 1)),
   };
 };
 

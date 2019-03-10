@@ -90,86 +90,87 @@
 /*!*********************!*\
   !*** ./src/data.js ***!
   \*********************/
-/*! exports provided: filters, tripPoints */
+/*! exports provided: filters, typeTripPoint, getTripPoint */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filters", function() { return filters; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tripPoints", function() { return tripPoints; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "typeTripPoint", function() { return typeTripPoint; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTripPoint", function() { return getTripPoint; });
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
+
+
 const filters = [
   {name: `Everything`, checked: true},
   {name: `Future`},
   {name: `Past`}
 ];
 
-const tripPoints = [
-  {
-    icon: `🚕`,
-    title: `Taxi to Airport`,
-    timeStart: `10:00`,
-    timeEnd: `11:00`,
-    duration: `1h 30m`,
-    price: `20`,
-    offers: [
-      {
-        name: `Order UBER`,
-        price: `20`
-      },
-      {
-        name: `Upgrade to business`,
-        price: `20`
-      }
-    ]
-  },
-  {
-    icon: `✈`,
-    title: `Flight to Geneva`,
-    timeStart: `10:00`,
-    timeEnd: `11:00`,
-    duration: `1h 30m`,
-    price: `20`,
-    offers: [
-      {
-        name: `Upgrade to business`,
-        price: `20`
-      },
-      {
-        name: `Select meal`,
-        price: `20`
-      }
-    ]
-  },
-  {
-    icon: `🚗`,
-    title: `Drive to Chamonix`,
-    timeStart: `10:00`,
-    timeEnd: `11:00`,
-    duration: `1h 30m`,
-    price: `20`,
-    offers: [
-      {
-        name: `Rent a car`,
-        price: `20`
-      }
-    ]
-  },
-  {
-    icon: `🝨`,
-    title: `Check into a hotel`,
-    timeStart: `10:00`,
-    timeEnd: `11:00`,
-    duration: `1h 30m`,
-    price: `20`,
-    offers: [
-      {
-        name: `Add breakfast`,
-        price: `20`
-      }
-    ]
-  },
-];
+const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`.split(`. `);
 
+const cities = [`Geneva`, `Amsterdam`, `Chamonix`, `Moscow`, `Berlin`, `Milan`, `Rome`, `Paris`, `Lisbon`];
+
+const typeTripPoint = {
+  'Taxi': `🚕`,
+  'Bus': `🚌`,
+  'Train': `🚂`,
+  'Ship': `🛳️`,
+  'Transport': `🚊`,
+  'Drive': `🚗`,
+  'Flight': `✈️`,
+  'Check-in': `🏨`,
+  'Sightseeing': `🏛️`,
+  'Restaurant': `🍴`,
+};
+
+const allOffers = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`];
+
+const getOffers = () => {
+  let offers = [];
+  let offersName = Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomArray"])(allOffers, 2);
+  offersName = new Set(offersName);
+  offersName.forEach((offerName) => {
+    offers.push({
+      name: offerName,
+      price: Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomInt"])(5, 50)
+    });
+  });
+  return offers;
+};
+
+const getRandomTimeParams = () => {
+  let startTime = new Date();
+  startTime.setDate(startTime.getDate() + Math.floor(Math.random() * 4));
+  startTime.setHours(Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomInt"])(0, 24), Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomInt"])(0, 60));
+
+  let timeEnd = new Date(startTime);
+  timeEnd.setHours(Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomInt"])(startTime.getHours(), 23), Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomInt"])(startTime.getMinutes(), 59));
+
+  return {
+    day: startTime.getTime(),
+    timeStart: startTime.getTime(),
+    timeEnd: timeEnd.getTime(),
+    duration: `${timeEnd.getHours() - startTime.getHours()}h ${timeEnd.getMinutes() - startTime.getMinutes()}m`
+  };
+};
+
+
+const getTripPoint = () => {
+  const timeParams = getRandomTimeParams();
+
+  return {
+    type: Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomValueFromArray"])(Object.keys(typeTripPoint)),
+    destination: Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomValueFromArray"])(cities),
+    day: timeParams.day,
+    timeStart: timeParams.timeStart,
+    timeEnd: timeParams.timeEnd,
+    duration: timeParams.duration,
+    price: Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomInt"])(15, 250),
+    offers: getOffers(),
+    description: new Set(Object(_utils_js__WEBPACK_IMPORTED_MODULE_0__["getRandomArray"])(descriptionText, 4, 1)),
+  };
+};
 
 
 
@@ -202,7 +203,7 @@ const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointContainer = document.querySelector(`.trip-day__items`);
 
 const init = () => {
-  const firstTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(NUMBER_TRIP_POINTS_ON_PAGE, _data_js__WEBPACK_IMPORTED_MODULE_0__["tripPoints"]);
+  const firstTripPoint = new Array(NUMBER_TRIP_POINTS_ON_PAGE).fill(``).map(_data_js__WEBPACK_IMPORTED_MODULE_0__["getTripPoint"]);
   Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(filtersContainer, _data_js__WEBPACK_IMPORTED_MODULE_0__["filters"], _template_filter_js__WEBPACK_IMPORTED_MODULE_2__["createFilter"]);
   Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(tripPointContainer, firstTripPoint, _template_trip_point_js__WEBPACK_IMPORTED_MODULE_3__["createTripPoint"]);
 
@@ -210,7 +211,7 @@ const init = () => {
     if (evt.target.nodeName === `INPUT`) {
       tripPointContainer.innerHTML = ``;
       const newQuantityTripPoint = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getRandomInt"])(1, MAX_TRIP_POINTS);
-      const randomTripPoints = Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["getNewListTripPoints"])(newQuantityTripPoint, _data_js__WEBPACK_IMPORTED_MODULE_0__["tripPoints"]);
+      const randomTripPoints = new Array(newQuantityTripPoint).fill(``).map(_data_js__WEBPACK_IMPORTED_MODULE_0__["getTripPoint"]);
       Object(_utils_js__WEBPACK_IMPORTED_MODULE_1__["renderElements"])(tripPointContainer, randomTripPoints, _template_trip_point_js__WEBPACK_IMPORTED_MODULE_3__["createTripPoint"]);
     }
   });
@@ -258,25 +259,21 @@ function createFilter(filterParam) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createTripPoint", function() { return createTripPoint; });
+/* harmony import */ var _data_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./data.js */ "./src/data.js");
+
+
 function createTripPoint(tripPointParam) {
-  let offers = ``;
-  tripPointParam.offers.forEach((offer) => {
-    offers += `
-      <li>
-        <button class="trip-point__offer">${offer.name} +&euro;&nbsp;${offer.price}</button>
-      </li>`;
-  });
   return `
     <article class="trip-point">
-      <i class="trip-icon">${tripPointParam.icon}</i>
-      <h3 class="trip-point__title">${tripPointParam.title}</h3>
+      <i class="trip-icon">${_data_js__WEBPACK_IMPORTED_MODULE_0__["typeTripPoint"][tripPointParam.type]}</i>
+      <h3 class="trip-point__title">${tripPointParam.type} to ${tripPointParam.destination}</h3>
       <p class="trip-point__schedule">
-        <span class="trip-point__timetable">${tripPointParam.timeStart}&nbsp;&mdash; ${tripPointParam.timeEnd}</span>
+        <span class="trip-point__timetable">${new Date(tripPointParam.timeStart).toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`, hour12: false})} &nbsp;&mdash; ${new Date(tripPointParam.timeEnd).toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`, hour12: false})} </span>
         <span class="trip-point__duration">${tripPointParam.duration}</span>
       </p>
       <p class="trip-point__price">&euro;&nbsp;${tripPointParam.price}</p>
       <ul class="trip-point__offers">
-        ${offers}
+        ${tripPointParam.offers.map((offer) => `<li><button class="trip-point__offer">${offer.name} +&euro;&nbsp;${offer.price}</button></li>`).join(``)}
       </ul>
     </article>`;
 }
@@ -290,14 +287,15 @@ function createTripPoint(tripPointParam) {
 /*!**********************!*\
   !*** ./src/utils.js ***!
   \**********************/
-/*! exports provided: getRandomInt, renderElements, getNewListTripPoints */
+/*! exports provided: getRandomInt, getRandomValueFromArray, getRandomArray, renderElements */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandomInt", function() { return getRandomInt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandomValueFromArray", function() { return getRandomValueFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandomArray", function() { return getRandomArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderElements", function() { return renderElements; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewListTripPoints", function() { return getNewListTripPoints; });
 const parser = new DOMParser();
 
 /**
@@ -309,48 +307,55 @@ const parser = new DOMParser();
  */
 const getRandomInt = (min, max) => Math.floor(Math.random() * Math.floor((max - min) + 1) + min);
 
+
+/**
+ * Возвращает случайное значение из массива
+ *
+ * @param {Array} array - исходный массив
+ * @return {any} значение массива
+ */
+const getRandomValueFromArray = (array) => {
+  return array[getRandomInt(0, array.length - 1)];
+};
+
 /**
  * Переобразовывает HTML код элемента в DOM узлы
  *
  * @param {Sring} html - строка содержащая HTML
- * @param {Node} container - DOM-элемент для отрисовки
+ * @return {NodeList} - список DOM-элемент
  */
-const insertHtmlToElement = (html, container) => {
+const insertHtmlToElement = (html) => {
   const element = parser.parseFromString(html, `text/html`);
-  const cardChildren = element.body.childNodes;
-  cardChildren.forEach((childNode) => container.appendChild(childNode));
+  return element.body.childNodes;
 };
 
 /**
  * Добавляет на страницу созданые из шаблона элементы
  *
  * @param {Node} container - DOM-элемент для отрисовки
- * @param {Array} elements - список элементов с параметрами
- * @param {Function} createElementHtml - функция изменения шаблона элемента на основе параметров
+ * @param {Array} elementsParam - список элементов с параметрами
+ * @param {Function} createElementHtml - cоздает шаблон элементf на основе данных
  */
-const renderElements = (container, elements, createElementHtml) => {
+const renderElements = (container, elementsParam, createElementHtml) => {
   const fragment = document.createDocumentFragment();
-  const elementsHtml = elements.map(createElementHtml);
+  const elementsHtml = elementsParam.map(createElementHtml);
   elementsHtml.forEach((element) => {
-    insertHtmlToElement(element, fragment);
+    const elementsNodes = insertHtmlToElement(element);
+    elementsNodes.forEach((childNode) => fragment.appendChild(childNode));
   });
   container.appendChild(fragment);
 };
 
 /**
- * Возвращает случаные события маршрута заданного количества
+ * Возвращает массив случайной длинны со случаные значениями
  *
- * @param {Number} quantity - новое количество
- * @param {Array} arrayTripPoint - исходный массив событий
- * @return {Array} новый массив событий
+ * @param {any} array - исходный массив
+ * @param {Number} maxQty - максимальная длина массива
+ * @param {Number} [minQty=0] - минимальная длина массива
+ * @return {Array} новый массив
  */
-const getNewListTripPoints = (quantity, arrayTripPoint) => {
-  const newArrayTripPoint = [];
-  for (let i = 0; i < quantity; i++) {
-    const j = getRandomInt(0, arrayTripPoint.length - 1);
-    newArrayTripPoint.push(arrayTripPoint[j]);
-  }
-  return newArrayTripPoint;
+const getRandomArray = (array, maxQty, minQty = 0) => {
+  return new Array(getRandomInt(minQty, maxQty)).fill(``).map(() => getRandomValueFromArray(array));
 };
 
 

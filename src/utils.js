@@ -9,45 +9,55 @@ const parser = new DOMParser();
  */
 const getRandomInt = (min, max) => Math.floor(Math.random() * Math.floor((max - min) + 1) + min);
 
+
+/**
+ * Возвращает случайное значение из массива
+ *
+ * @param {Array} array - исходный массив
+ * @return {any} значение массива
+ */
+const getRandomValueFromArray = (array) => {
+  return array[getRandomInt(0, array.length - 1)];
+};
+
 /**
  * Переобразовывает HTML код элемента в DOM узлы
  *
  * @param {Sring} html - строка содержащая HTML
- * @param {Node} container - DOM-элемент для отрисовки
+ * @return {NodeList} - список DOM-элемент
  */
-const insertHtmlToElement = (html, container) => {
+const insertHtmlToElement = (html) => {
   const element = parser.parseFromString(html, `text/html`);
-  const cardChildren = element.body.childNodes;
-  cardChildren.forEach((childNode) => container.appendChild(childNode));
+  return element.body.childNodes;
 };
 
 /**
  * Добавляет на страницу созданые из шаблона элементы
  *
  * @param {Node} container - DOM-элемент для отрисовки
- * @param {Array} elements - список элементов с параметрами
- * @param {Function} createElementHtml - функция изменения шаблона элемента на основе параметров
+ * @param {Array} elementsParam - список элементов с параметрами
+ * @param {Function} createElementHtml - cоздает шаблон элементf на основе данных
  */
-const renderElements = (container, elements, createElementHtml) => {
+const renderElements = (container, elementsParam, createElementHtml) => {
   const fragment = document.createDocumentFragment();
-  const elementsHtml = elements.map(createElementHtml);
+  const elementsHtml = elementsParam.map(createElementHtml);
   elementsHtml.forEach((element) => {
-    insertHtmlToElement(element, fragment);
+    const elementsNodes = insertHtmlToElement(element);
+    elementsNodes.forEach((childNode) => fragment.appendChild(childNode));
   });
   container.appendChild(fragment);
 };
 
 /**
- * Возвращает случаные события маршрута заданного количества
+ * Возвращает массив случайной длинны со случаные значениями
  *
- * @param {Number} quantity - новое количество
- * @param {Function} getTripPoint - функция возвращающая объект с данными для собитий маршрута
- * @return {Array} новый массив событий
+ * @param {any} array - исходный массив
+ * @param {Number} maxQty - максимальная длина массива
+ * @param {Number} [minQty=0] - минимальная длина массива
+ * @return {Array} новый массив
  */
-const getNewListTripPoints = (quantity, getTripPoint) => {
-  return new Array(quantity).fill(``).map(()=>{
-    return getTripPoint();
-  });
+const getRandomArray = (array, maxQty, minQty = 0) => {
+  return new Array(getRandomInt(minQty, maxQty)).fill(``).map(() => getRandomValueFromArray(array));
 };
 
-export {getRandomInt, renderElements, getNewListTripPoints};
+export {getRandomInt, getRandomValueFromArray, getRandomArray, renderElements};
