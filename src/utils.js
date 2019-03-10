@@ -7,7 +7,7 @@ const parser = new DOMParser();
  * @param {Number} max - максимально возможное значение
  * @return {Number}
  */
-const getRandomInt = (min, max) => Math.floor(Math.random() * Math.floor((max - min) + 1) + min);
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
 
 /**
@@ -17,7 +17,7 @@ const getRandomInt = (min, max) => Math.floor(Math.random() * Math.floor((max - 
  * @return {any} значение массива
  */
 const getRandomValueFromArray = (array) => {
-  return array[getRandomInt(0, array.length - 1)];
+  return array[getRandomInt(0, array.length)];
 };
 
 /**

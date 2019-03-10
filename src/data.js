@@ -17,7 +17,7 @@ const typeTripPoint = {
   'Ship': `🛳️`,
   'Transport': `🚊`,
   'Drive': `🚗`,
-  'Flight': `✈️`,
+  'Flight': `✈️`,
   'Check-in': `🏨`,
   'Sightseeing': `🏛️`,
   'Restaurant': `🍴`,
