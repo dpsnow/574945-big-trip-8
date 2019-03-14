@@ -1,5 +1,11 @@
 const parser = new DOMParser();
 
+const getRandomBoolean = () => !!(Math.random() > 0.5);
+
+const isFunction = (value) => {
+  return typeof value === `function`;
+};
+
 /**
  * Возвращает случайное целое число из заданного диапазона
  *
@@ -26,7 +32,7 @@ const getRandomValueFromArray = (array) => {
  * @param {Sring} html - строка содержащая HTML
  * @return {NodeList} - список DOM-элемент
  */
-const insertHtmlToElement = (html) => {
+const createElement = (html) => {
   const element = parser.parseFromString(html, `text/html`);
   return element.body.childNodes;
 };
@@ -35,15 +41,13 @@ const insertHtmlToElement = (html) => {
  * Добавляет на страницу созданые из шаблона элементы
  *
  * @param {Node} container - DOM-элемент для отрисовки
- * @param {Array} elementsParam - список элементов с параметрами
- * @param {Function} createElementHtml - cоздает шаблон элементf на основе данных
+ * @param {Array} elements - массив элементов
+
  */
-const renderElements = (container, elementsParam, createElementHtml) => {
+const renderElements = (container, elements) => {
   const fragment = document.createDocumentFragment();
-  const elementsHtml = elementsParam.map(createElementHtml);
-  elementsHtml.forEach((element) => {
-    const elementsNodes = insertHtmlToElement(element);
-    elementsNodes.forEach((childNode) => fragment.appendChild(childNode));
+  elements.forEach((element) => {
+    fragment.appendChild(element);
   });
   container.appendChild(fragment);
 };
@@ -60,4 +64,4 @@ const getRandomArray = (array, maxQty, minQty = 0) => {
   return new Array(getRandomInt(minQty, maxQty)).fill(``).map(() => getRandomValueFromArray(array));
 };
 
-export {getRandomInt, getRandomValueFromArray, getRandomArray, renderElements};
+export {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray, createElement, renderElements, isFunction};
