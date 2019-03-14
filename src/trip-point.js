@@ -1,4 +1,4 @@
-import {createElement} from './utils.js';
+import {createElement, isFunction} from './utils.js';
 import {typeTripPoint} from './data.js';
 
 class TripPoint {
@@ -11,6 +11,7 @@ class TripPoint {
     this._duration = data.duration;
     this._price = data.price;
     this._offers = data.offers;
+    this._onTripPointClick = this._onTripPointClick.bind(this);
   }
 
   get _icon() {
@@ -43,12 +44,12 @@ class TripPoint {
 
   render() {
     this._element = createElement(this.template)[0];
-    this.addHandlers();
+    this.bind();
     return this._element;
   }
 
   unrender() {
-    this.removeHandlers();
+    this.unbind();
     this._element.remove();
     this._element = null;
   }
@@ -58,17 +59,17 @@ class TripPoint {
   }
 
   _onTripPointClick() {
-    if (typeof this._onEdit === `function`) {
+    if (isFunction(this._onEdit)) {
       this._onEdit();
     }
   }
 
-  addHandlers() {
-    this._element.addEventListener(`click`, this._onTripPointClick.bind(this));
+  bind() {
+    this._element.addEventListener(`click`, this._onTripPointClick);
   }
 
-  removeHandlers() {
-    this._element.removeEventListener(`click`, this._onTripPointClick.bind(this));
+  unbind() {
+    this._element.removeEventListener(`click`, this._onTripPointClick);
   }
 
 }

@@ -2,6 +2,10 @@ const parser = new DOMParser();
 
 const getRandomBoolean = () => !!(Math.random() > 0.5);
 
+const isFunction = (value) => {
+  return typeof value === `function`;
+};
+
 /**
  * Возвращает случайное целое число из заданного диапазона
  *
@@ -60,4 +64,4 @@ const getRandomArray = (array, maxQty, minQty = 0) => {
   return new Array(getRandomInt(minQty, maxQty)).fill(``).map(() => getRandomValueFromArray(array));
 };
 
-export {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray, createElement, renderElements};
+export {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray, createElement, renderElements, isFunction};

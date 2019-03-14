@@ -1,4 +1,4 @@
-import {createElement} from './utils.js';
+import {createElement, isFunction} from './utils.js';
 import {typeTripPoint} from './data.js';
 
 class TripPointEdit {
@@ -14,6 +14,8 @@ class TripPointEdit {
     this._picture = data.picture;
     this._description = data.description;
     this._isFavorite = data.isFavorite;
+    this._onSubmitBtnClick = this._onSubmitBtnClick.bind(this);
+    this._onResetBtnClick = this._onResetBtnClick.bind(this);
   }
 
   get _icon() {
@@ -134,12 +136,12 @@ class TripPointEdit {
 
   render() {
     this._element = createElement(this.template)[0];
-    this.addHandlers();
+    this.bind();
     return this._element;
   }
 
   unrender() {
-    this.removeHandlers();
+    this.unbind();
     this._element.remove();
     this._element = null;
   }
@@ -150,17 +152,24 @@ class TripPointEdit {
 
   _onSubmitBtnClick(evt) {
     evt.preventDefault();
-    if (typeof this._onSubmit === `function`) {
+    if (isFunction(this._onSubmit)) {
       this._onSubmit();
     }
   }
 
-  addHandlers() {
-    this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitBtnClick.bind(this));
+  _onResetBtnClick(evt) {
+    evt.preventDefault();
+    this.unrender();
   }
 
-  removeHandlers() {
-    this._element.removeEventListener(`click`, this._onSubmitBtnClick.bind(this));
+  bind() {
+    this._element.querySelector(`.point__button--save`).addEventListener(`click`, this._onSubmitBtnClick);
+    this._element.querySelector(`.point__button[type=reset]`).addEventListener(`click`, this._onResetBtnClick);
+  }
+
+  unbind() {
+    this._element.removeEventListener(`click`, this._onSubmitBtnClick);
+    this._element.removeEventListener(`click`, this._onResetBtnClick);
   }
 
 }
