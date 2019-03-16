@@ -1,8 +1,10 @@
-import {createElement, isFunction} from './utils.js';
+import {isFunction} from './utils.js';
 import {typeTripPoint} from './data.js';
+import {Component} from './component.js';
 
-class TripPointEdit {
+class TripPointEdit extends Component {
   constructor(data) {
+    super();
     this._type = data.type;
     this._destination = data.destination;
     this._day = data.day;
@@ -128,22 +130,6 @@ class TripPointEdit {
       </section>
     </form>
   </article>`.trim();
-  }
-
-  get element() {
-    return this._element;
-  }
-
-  render() {
-    this._element = createElement(this.template)[0];
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element.remove();
-    this._element = null;
   }
 
   set onSubmit(fn) {
