@@ -1,10 +1,10 @@
 import {filtersData, tripPointData} from './data.js';
 import {getRandomInt, renderElements, createElement} from './utils.js';
 
-import {createFilter} from './template-filter.js';
+import {createFilter} from './template/filter-template.js';
 // import {createTripPoint} from './template-trip-point.js';
-import {TripPoint} from './trip-point.js';
-import {TripPointEdit} from './trip-point-edit.js';
+import {TripPoint} from './trip-point/trip-point.js';
+import {TripPointEdit} from './trip-point/trip-point-edit.js';
 
 const NUMBER_TRIP_POINTS_ON_PAGE = 7;
 const MAX_TRIP_POINTS = 10;
@@ -30,7 +30,8 @@ const renderTripPoints = (qty) => {
       tripPoint.unrender();
     };
 
-    editTripPoint.onSubmit = () => {
+    editTripPoint.onSubmit = (updateDate) => {
+      tripPoint.update(updateDate);
       tripPoint.render();
       tripPointContainer.replaceChild(tripPoint.element, editTripPoint.element);
       editTripPoint.unrender();

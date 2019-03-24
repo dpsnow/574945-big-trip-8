@@ -11,16 +11,16 @@ const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit
 const cities = [`Geneva`, `Amsterdam`, `Chamonix`, `Moscow`, `Berlin`, `Milan`, `Rome`, `Paris`, `Lisbon`];
 
 const typeTripPoint = {
-  'Taxi': `🚕`,
-  'Bus': `🚌`,
-  'Train': `🚂`,
-  'Ship': `🛳️`,
-  'Transport': `🚊`,
-  'Drive': `🚗`,
-  'Flight': `✈️`,
-  'Check-in': `🏨`,
-  'Sightseeing': `🏛️`,
-  'Restaurant': `🍴`,
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🛳️`,
+  'transport': `🚊`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛️`,
+  'restaurant': `🍴`,
 };
 
 const allOffers = [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`];
@@ -50,7 +50,7 @@ const getRandomTimeParams = () => {
     day: startTime.getTime(),
     timeStart: startTime.getTime(),
     timeEnd: timeEnd.getTime(),
-    duration: `${timeEnd.getHours() - startTime.getHours()}h ${timeEnd.getMinutes() - startTime.getMinutes()}m`
+    // duration: `${timeEnd.getHours() - startTime.getHours()}h ${timeEnd.getMinutes() - startTime.getMinutes()}m`
   };
 };
 
@@ -64,7 +64,7 @@ const tripPointData = () => {
     day: timeParams.day,
     timeStart: timeParams.timeStart,
     timeEnd: timeParams.timeEnd,
-    duration: timeParams.duration,
+    // duration: timeParams.duration,
     price: getRandomInt(15, 250),
     offers: getOffers(),
     picture: `http://picsum.photos/150/150?r=${getRandomInt(0, 155)}`,
