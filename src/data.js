@@ -13,14 +13,8 @@ const descriptionText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit
 const cities = [`Geneva`, `Amsterdam`, `Chamonix`, `Moscow`, `Berlin`, `Milan`, `Rome`, `Paris`, `Lisbon`];
 
 const getOffers = (type) => {
-  let addedOffers = [];
-  if (getRandomBoolean()) {
-    const randomValue = getRandomArray(typeTripPoint[type].offers, 3)
-    const newlistoffers = new Set(randomValue);
-    addedOffers = [...newlistoffers];
-  }
-
-  return addedOffers;
+  let allOffersForType = getRandomBoolean() && getRandomArray(typeTripPoint[type].offers, 3) || [];
+  return [...new Set(allOffersForType)];
 };
 
 const getRandomTimeParams = () => {
@@ -32,7 +26,6 @@ const getRandomTimeParams = () => {
     timeEnd
   ];
 };
-
 
 const tripPointData = () => {
   const [timeStart, timeEnd] = getRandomTimeParams();
