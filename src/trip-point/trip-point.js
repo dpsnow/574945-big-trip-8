@@ -1,30 +1,25 @@
 import moment from 'moment';
-import {isFunction, formatDate} from '../utils.js';
-import {typeTripPoint} from '../data.js';
+import {isFunction} from '../utils.js';
 import {Component} from '../component.js';
 import {getTemplate} from '../template/trip-point-template.js';
 
 class TripPoint extends Component {
   constructor(data) {
+    // console.log('in TripPoint', data);
     super();
+    this._icon = data.icon;
     this._type = data.type;
     this._destination = data.destination;
     this._day = data.day;
     this._timeStart = data.timeStart;
     this._timeEnd = data.timeEnd;
-    // this._duration = data.duration;
+    this._times = data.times;
     this._price = data.price;
-    this._offers = data.offers;
+    this._offers = data.addedOffers;
+
+    this._isFavorite = data.isFavorite;
 
     this._onTripPointClick = this._onTripPointClick.bind(this);
-  }
-
-  get _icon() {
-    return typeTripPoint[this._type.toLocaleLowerCase()];
-  }
-
-  get _times() {
-    return `${formatDate(this._timeStart, `HH:mm`)} — ${formatDate(this._timeEnd, `HH:mm`)}`;
   }
 
   get _duration() {
@@ -54,15 +49,16 @@ class TripPoint extends Component {
     this._element.removeEventListener(`click`, this._onTripPointClick);
   }
 
-  update({type, destination, day, timeStart, timeEnd, price, offers, isFavorite}) {
+  update({icon, type, destination, day, timeStart, timeEnd, times, price, addedOffers, isFavorite}) {
+    this._icon = icon;
     this._type = type;
     this._destination = destination;
     this._day = day;
     this._timeStart = timeStart;
     this._timeEnd = timeEnd;
-    // this._duration = duration;
+    this._times = times;
     this._price = price;
-    this._offers = offers;
+    this._offers = addedOffers;
     this._isFavorite = isFavorite;
   }
 }

@@ -67,12 +67,12 @@ const getRandomArray = (array, maxQty, minQty = 0) => {
 };
 
 const formatDate = (date, format) => {
-  // console.log(`formatDate:, date = ${date} typeof ${typeof date},  format = ${format} typeof ${typeof format}`);
+  // console.log(`formatDate:, date = ${date} typeof ${typeof date},  format = ${format}  typeof ${typeof format}`);
   return moment(date).isValid() ? moment(date).format(format) : ``;
 };
 
 const updateTime = (date, time) => {
-  // console.log(`formatDate:, date = ${date} typeof ${typeof date},  format = ${time} typeof ${typeof time}`);
+  // console.log(`formatDate:, date = ${date} typeof ${typeof date},  format = ${time}  typeof ${typeof time}`);
   const [hours, minutes] = time.split(`:`);
   return moment(date, `x`).hours(+hours).minutes(+minutes).format(`x`);
 };

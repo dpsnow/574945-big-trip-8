@@ -1,4 +1,19 @@
+import {typeTripPoint, Offers} from '../trip-point/trip-point-constants.js';
+
+export const renderAllOffers = (point) => {
+  return point._allOffers.map((offer) => {
+    return `
+    <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}"
+    ${point._addedOffers.includes(offer) ? `checked` : ``}>
+    <label for="${offer}" class="point__offers-label">
+      <span class="point__offer-service">${Offers[offer]}</span> + €<span class="point__offer-price">25</span>
+    </label>
+    `;
+  }).join(``);
+};
+
 export const getTemplate = (point) => {
+  // console.log('from TripPointEdit', point);
   return `
   <article class="point">
   <form action="" method="get">
@@ -15,31 +30,14 @@ export const getTemplate = (point) => {
 
         <div class="travel-way__select">
           <div class="travel-way__select-group">
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi" name="travel-way" value="taxi">
-            <label class="travel-way__select-label" for="travel-way-taxi">🚕 taxi</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-bus" name="travel-way" value="bus">
-            <label class="travel-way__select-label" for="travel-way-bus">🚌 bus</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
-            <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
-            <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
-          </div>
-
-          <div class="travel-way__select-group">
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
-            <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
-            <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
+            ${Object.keys(typeTripPoint).map((typeName) => `<input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-${typeName}" name="travel-way" value="${typeName}" ${point._type === `${typeName}` ? `checked` : ``}>
+            <label class="travel-way__select-label" for="travel-way-${typeName}">${typeTripPoint[typeName].icon} ${typeName}</label>`).join(``)}
           </div>
         </div>
       </div>
 
       <div class="point__destination-wrap">
-        <label class="point__destination-label" for="destination">${point._type} to</label>
+        <label class="point__destination-label" for="destination">${typeTripPoint[point._type].text}</label>
         <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination}" name="destination">
         <datalist id="destination-select">
           <option value="airport"></option>
@@ -75,14 +73,7 @@ export const getTemplate = (point) => {
       <section class="point__offers">
         <h3 class="point__details-title">offers</h3>
 
-        <div class="point__offers-wrap">
-         ${point._offers.map((offer) => `
-<input class="point__offers-input visually-hidden" type="checkbox" id="${offer.name.replace(` `, `-`).toLowerCase()}" name="offer" value="${offer.name}">
-<label for="${offer.name.replace(` `, `-`).toLowerCase()}" class="point__offers-label">
-<span class="point__offer-service">${offer.name}</span> + €
-<span class="point__offer-price">${offer.price}</span>
-</label>
-         `).join(``)}
+        <div class="point__offers-wrap">${renderAllOffers(point)}
         </div>
 
       </section>
