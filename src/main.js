@@ -1,10 +1,10 @@
 import {filtersData, tripPointData} from './data.js';
 import {getRandomInt, renderElements, createElement} from './utils.js';
 
-import {createFilter} from './template-filter.js';
-// import {createTripPoint} from './template-trip-point.js';
-import {TripPoint} from './trip-point.js';
-import {TripPointEdit} from './trip-point-edit.js';
+import {createFilter} from './template/filter-template.js';
+import {TripPointEntity} from './trip-point/trip-point-entity.js';
+import {TripPoint} from './trip-point/trip-point.js';
+import {TripPointEdit} from './trip-point/trip-point-edit.js';
 
 const NUMBER_TRIP_POINTS_ON_PAGE = 7;
 const MAX_TRIP_POINTS = 10;
@@ -19,7 +19,9 @@ const renderFilters = () => {
 };
 
 const renderTripPoints = (qty) => {
-  const tripPointsData = new Array(qty).fill(``).map(tripPointData);
+
+  const tripPointsData = new Array(qty).fill(``).map(() => new TripPointEntity(tripPointData()));
+
   const tripPoitsElements = tripPointsData.map((pointData) => {
     const tripPoint = new TripPoint(pointData);
     const editTripPoint = new TripPointEdit(pointData);
@@ -30,7 +32,8 @@ const renderTripPoints = (qty) => {
       tripPoint.unrender();
     };
 
-    editTripPoint.onSubmit = () => {
+    editTripPoint.onSubmit = (updateDate) => {
+      tripPoint.update(updateDate);
       tripPoint.render();
       tripPointContainer.replaceChild(tripPoint.element, editTripPoint.element);
       editTripPoint.unrender();

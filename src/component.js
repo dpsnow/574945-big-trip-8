@@ -33,6 +33,8 @@ class Component {
   bind() {}
 
   unbind() {}
+
+  update() {}
 }
 
 export {Component};
