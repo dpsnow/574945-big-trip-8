@@ -45,4 +45,6 @@ const tripPointData = () => {
   };
 };
 
-export {filtersData, typeTripPoint, tripPointData};
+const getTripPointsData = (qty) => (new Array(qty).fill(``).map(() => tripPointData()));
+
+export {filtersData, getTripPointsData};

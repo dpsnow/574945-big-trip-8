@@ -1,4 +1,4 @@
-import {filtersData, tripPointData} from './data.js';
+import {filtersData, getTripPointsData} from './data.js';
 import {getRandomInt, renderElements, createElement} from './utils.js';
 
 import {createFilter} from './template/filter-template.js';
@@ -18,11 +18,12 @@ const renderFilters = () => {
   renderElements(filtersContainer, filterElements);
 };
 
-const renderTripPoints = (qty) => {
+const renderTripPoints = (tripPointsData) => {
 
-  const tripPointsData = new Array(qty).fill(``).map(() => new TripPointEntity(tripPointData()));
+  // const tripPointsData = new Array(qty).fill(``).map(() => new TripPointEntity(tripPointData()));
 
-  const tripPoitsElements = tripPointsData.map((pointData) => {
+  const tripPoitsElements = tripPointsData.map((data)=> {
+    const pointData = new TripPointEntity(data);
     const tripPoint = new TripPoint(pointData);
     const editTripPoint = new TripPointEdit(pointData);
 
@@ -41,19 +42,23 @@ const renderTripPoints = (qty) => {
 
     return tripPoint.render();
   });
+
   renderElements(tripPointContainer, tripPoitsElements);
 };
 
 
 const init = () => {
+  let tripPointsData = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
+  // console.log(`данные`, tripPointsData);
+
   renderFilters();
-  renderTripPoints(NUMBER_TRIP_POINTS_ON_PAGE);
+  renderTripPoints(tripPointsData);
 
   filtersContainer.addEventListener(`click`, (evt) => {
     if (evt.target.nodeName === `INPUT`) {
       tripPointContainer.innerHTML = ``;
-      const newQuantityTripPoint = getRandomInt(1, MAX_TRIP_POINTS);
-      renderTripPoints(newQuantityTripPoint);
+      tripPointsData = getTripPointsData(getRandomInt(1, MAX_TRIP_POINTS));
+      renderTripPoints(tripPointsData);
     }
   });
 };
