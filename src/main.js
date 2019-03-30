@@ -2,9 +2,9 @@ import {filtersData, getTripPointsData} from './data.js';
 import {getRandomInt, renderElements, createElement} from './utils.js';
 
 import {createFilter} from './template/filter-template.js';
-import {TripPointEntity} from './trip-point/trip-point-entity.js';
-import {TripPoint} from './trip-point/trip-point.js';
-import {TripPointEdit} from './trip-point/trip-point-edit.js';
+import {TripPointEntity} from './trip-points/trip-point-entity.js';
+import {TripPoint} from './trip-points/trip-point.js';
+import {TripPointEdit} from './trip-points/trip-point-edit.js';
 
 const NUMBER_TRIP_POINTS_ON_PAGE = 7;
 const MAX_TRIP_POINTS = 10;
@@ -19,13 +19,17 @@ const renderFilters = () => {
 };
 
 const renderTripPoints = (tripPointsData) => {
+  const tripPoitsElements = [];
 
-  // const tripPointsData = new Array(qty).fill(``).map(() => new TripPointEntity(tripPointData()));
+  console.log(`tripPointsData`, tripPointsData);
 
-  const tripPoitsElements = tripPointsData.map((data)=> {
-    const pointData = new TripPointEntity(data);
-    const tripPoint = new TripPoint(pointData);
-    const editTripPoint = new TripPointEdit(pointData);
+  // вариант через Entity
+  tripPointsData.forEach((pointEntity, i) => {
+
+    // tripPointsData.forEach((dataOneTripPoint, i) => {
+    // const pointEntity = new TripPointEntity(dataOneTripPoint);
+    const tripPoint = new TripPoint(pointEntity);
+    const editTripPoint = new TripPointEdit(pointEntity);
 
     tripPoint.onEdit = () => {
       editTripPoint.render();
@@ -34,13 +38,22 @@ const renderTripPoints = (tripPointsData) => {
     };
 
     editTripPoint.onSubmit = (updateDate) => {
+      console.log(`updateDate`, updateDate);
+      tripPointsData[i] = updateDate;
+
       tripPoint.update(updateDate);
       tripPoint.render();
       tripPointContainer.replaceChild(tripPoint.element, editTripPoint.element);
       editTripPoint.unrender();
     };
 
-    return tripPoint.render();
+    editTripPoint.onDelete = () => {
+      console.log(`dataOneTripPoint`, pointEntity);
+      tripPointsData[i] = null;
+      editTripPoint.unrender();
+    };
+
+    tripPoitsElements.push(tripPoint.render());
   });
 
   renderElements(tripPointContainer, tripPoitsElements);
@@ -48,17 +61,23 @@ const renderTripPoints = (tripPointsData) => {
 
 
 const init = () => {
-  let tripPointsData = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
-  // console.log(`данные`, tripPointsData);
-
+  // let tripPointsData = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
   renderFilters();
-  renderTripPoints(tripPointsData);
+
+  // вариант через Entity
+  let inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
+  const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
+  renderTripPoints(tripPointsEntities);
+
+  // renderTripPoints(tripPointsData);
 
   filtersContainer.addEventListener(`click`, (evt) => {
     if (evt.target.nodeName === `INPUT`) {
       tripPointContainer.innerHTML = ``;
-      tripPointsData = getTripPointsData(getRandomInt(1, MAX_TRIP_POINTS));
-      renderTripPoints(tripPointsData);
+      console.log(tripPointsEntities);
+
+      // tripPointsData = getTripPointsData(getRandomInt(1, MAX_TRIP_POINTS));
+      // renderTripPoints(tripPointsData);
     }
   });
 };

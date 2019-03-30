@@ -5,7 +5,7 @@ import {isFunction, createElement, renderElements} from '../utils.js';
 import {Component} from '../component.js';
 import {getTemplate, renderAllOffers} from '../template/trip-point-edit-template.js';
 import {TripPointEntity} from './trip-point-entity.js';
-import {typeTripPoint} from '../trip-point/trip-point-constants.js';
+import {typeTripPoint} from '../trip-points/trip-point-constants.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_green.css';
@@ -40,6 +40,10 @@ class TripPointEdit extends Component {
     this._onSubmit = fn;
   }
 
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
   _onSubmitBtnClick(evt) {
     evt.preventDefault();
     const newDate = new FormData(evt.target);
@@ -50,11 +54,14 @@ class TripPointEdit extends Component {
     }
 
     this.update(updateDate);
+    return updateDate;
   }
 
   _onResetBtnClick(evt) {
     evt.preventDefault();
-    this.unrender();
+    if (isFunction(this._onDelete)) {
+      this._onDelete();
+    }
   }
 
 

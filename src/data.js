@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray} from './utils.js';
-import {typeTripPoint} from './trip-point/trip-point-constants.js';
+import {typeTripPoint} from './trip-points/trip-point-constants.js';
 
 const filtersData = [
   {name: `Everything`, checked: true},

@@ -1,4 +1,4 @@
-import {typeTripPoint, Offers} from '../trip-point/trip-point-constants.js';
+import {typeTripPoint, Offers} from '../trip-points/trip-point-constants.js';
 
 export const renderAllOffers = (point) => {
   return point._allOffers.map((offer) => {

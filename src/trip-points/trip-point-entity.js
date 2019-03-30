@@ -3,7 +3,7 @@ import {typeTripPoint} from './trip-point-constants.js';
 
 class TripPointEntity {
   constructor(data) {
-    // console.log('in TripPointEntity', data);
+    console.log(`in TripPointEntity`, data);
     this.day = data.day || Number(formatDate([], `x`), 10);
     this.timeStart = Number(data.timeStart) || undefined;
     this.timeEnd = Number(data.timeEnd) || undefined;
