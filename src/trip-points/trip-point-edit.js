@@ -1,4 +1,4 @@
-// import flatpickr from 'flatpickr';
+import flatpickr from 'flatpickr';
 
 import {isFunction, createElement, renderElements} from '../utils.js';
 
@@ -87,8 +87,23 @@ class TripPointEdit extends Component {
 
   }
 
+  _initFlatpickr() {
+    const inputTime = this._element.querySelector(`.point__time .point__input`);
+    flatpickr(inputTime, {
+      mode: `range`,
+      enableTime: true,
+      altFormat: `H:i`,
+      [`time_24hr`]: true,
+      altInput: true,
+      dateFormat: `U`,
+      locale: {
+        rangeSeparator: ` — `
+      },
+    });
+  }
+
   bind() {
-    // this._initFlatpickr();
+    this._initFlatpickr();
     this._element.querySelector(`.point form`).addEventListener(`reset`, this._onResetBtnClick);
     this._element.querySelector(`.point form`).addEventListener(`submit`, this._onSubmitBtnClick);
     this._element.querySelectorAll(`.travel-way__select-input`).forEach((elem) => elem.addEventListener(`change`, this._onChangeType));

@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {formatDate, updateTime} from '../utils.js';
 import {typeTripPoint} from './trip-point-constants.js';
 
@@ -21,8 +22,10 @@ class TripPointEntity {
 
     if (data.time) {
       const [timeStart, timeEnd] = data.time.split(` — `);
-      this.timeStart = parseInt(updateTime(this.day, timeStart), 10);
-      this.timeEnd = parseInt(updateTime(this.day, timeEnd), 10);
+      this.timeStart = moment(timeStart, `X`).valueOf();
+      this.timeEnd = moment(timeEnd, `X`).valueOf();
+      // this.timeStart = parseInt(updateTime(this.day, timeStart), 10);
+      // this.timeEnd = parseInt(updateTime(this.day, timeEnd), 10);
     }
   }
 
