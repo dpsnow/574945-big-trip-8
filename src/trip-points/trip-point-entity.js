@@ -3,7 +3,7 @@ import {typeTripPoint} from './trip-point-constants.js';
 
 class TripPointEntity {
   constructor(data) {
-    console.log(`in TripPointEntity`, data);
+    // console.log(`in TripPointEntity`, data);
     this.day = data.day || Number(formatDate([], `x`), 10);
     this.timeStart = Number(data.timeStart) || undefined;
     this.timeEnd = Number(data.timeEnd) || undefined;
@@ -14,6 +14,9 @@ class TripPointEntity {
     this.addedOffers = data.offer && [].concat(data.offer) || [];
     this.picture = data.picture || ``;
     this.description = data.description || ``;
+
+    this._isVisible = true;
+
     // data[`total-price`];
 
     if (data.time) {
@@ -21,6 +24,14 @@ class TripPointEntity {
       this.timeStart = parseInt(updateTime(this.day, timeStart), 10);
       this.timeEnd = parseInt(updateTime(this.day, timeEnd), 10);
     }
+  }
+
+  get isVisible() {
+    return this._isVisible;
+  }
+
+  set isVisible(value) {
+    this._isVisible = value;
   }
 
   get allOffers() {

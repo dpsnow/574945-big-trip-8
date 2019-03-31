@@ -19,7 +19,7 @@ const getOffers = (type) => {
 
 const getRandomTimeParams = () => {
   const timeStart = moment().add(getRandomInt(0, 7), `days`).add(getRandomInt(0, 24), `hours`).format(`x`);
-  const timeEnd = moment(timeStart, `x`).add(getRandomInt(0, 24), `hours`).format(`x`);
+  const timeEnd = moment(timeStart, `x`).add({hours: getRandomInt(0, 24), minutes: getRandomInt(0, 60)}).format(`x`);
 
   return [
     timeStart,
