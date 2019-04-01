@@ -36,6 +36,7 @@ const getRandomValueFromArray = (array) => {
  */
 const createElement = (html) => {
   const element = parser.parseFromString(html, `text/html`);
+  // console.log(`createElement childNodes`, element.body.childNodes);
   return element.body.childNodes;
 };
 
@@ -49,6 +50,7 @@ const createElement = (html) => {
 const renderElements = (container, elements) => {
   const fragment = document.createDocumentFragment();
   elements.forEach((element) => {
+    // console.log(element);
     fragment.appendChild(element);
   });
   container.appendChild(fragment);

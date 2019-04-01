@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray} from './utils.js';
-import {typeTripPoint} from './trip-point/trip-point-constants.js';
+import {typeTripPoint} from './trip-points/trip-point-constants.js';
 
 const filtersData = [
   {name: `Everything`, checked: true},
@@ -19,7 +19,7 @@ const getOffers = (type) => {
 
 const getRandomTimeParams = () => {
   const timeStart = moment().add(getRandomInt(0, 7), `days`).add(getRandomInt(0, 24), `hours`).format(`x`);
-  const timeEnd = moment(timeStart, `x`).add(getRandomInt(0, 24), `hours`).format(`x`);
+  const timeEnd = moment(timeStart, `x`).add({hours: getRandomInt(0, 24), minutes: getRandomInt(0, 60)}).format(`x`);
 
   return [
     timeStart,
@@ -45,4 +45,6 @@ const tripPointData = () => {
   };
 };
 
-export {filtersData, typeTripPoint, tripPointData};
+const getTripPointsData = (qty) => (new Array(qty).fill(``).map(() => tripPointData()));
+
+export {filtersData, getTripPointsData};

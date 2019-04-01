@@ -1,4 +1,5 @@
-import {typeTripPoint, Offers} from '../trip-point/trip-point-constants.js';
+import {formatDate} from '../utils.js';
+import {typeTripPoint, Offers} from '../trip-points/trip-point-constants.js';
 
 export const renderAllOffers = (point) => {
   return point._allOffers.map((offer) => {
@@ -49,7 +50,7 @@ export const getTemplate = (point) => {
 
       <label class="point__time">
         choose time
-        <input class="point__input" type="text" value="${point._times}" name="time" placeholder="00:00&nbsp;&mdash;&nbsp;00:00">
+        <input class="point__input" type="text" value="${formatDate(point._timeStart, `X`)} — ${formatDate(point._timeEnd, `X`)}" name="time" placeholder="00:00&nbsp;&mdash;&nbsp;00:00">
       </label>
 
       <label class="point__price">
