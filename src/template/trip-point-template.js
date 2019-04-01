@@ -1,4 +1,4 @@
-import {typeTripPoint, Offers} from '../trip-point/trip-point-constants.js';
+import {typeTripPoint, Offers} from '../trip-points/trip-point-constants.js';
 
 const getCheckedOffer = (point) => {
   return point._offers.map((offer) => `<li><button class="trip-point__offer">${Offers[offer]} + €25</button></li>`).join(``);

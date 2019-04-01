@@ -1,13 +1,14 @@
-function createFilter(filterParam) {
+export const getTemplate = (filterParam) => {
+  // console.log('from Filter', filterParam);
   return `
-  <input
-    type="radio"
-    id="filter-${filterParam.name}"
-    name="filter" value="${filterParam.name}"
-    ${filterParam.checked ? `checked` : ``} />
-  <label class="trip-filter__item" for="filter-${filterParam.name}">
-    ${filterParam.name}
-  </label>`;
-}
-
-export {createFilter};
+  <span>
+    <input
+      type="radio"
+      id="filter-${filterParam._name}"
+      name="filter" value="${filterParam._name}"
+      ${filterParam._checked ? `checked` : ``} />
+    <label class="trip-filter__item" for="filter-${filterParam._name}">
+      ${filterParam._name}
+    </label>
+  </span>`;
+};
