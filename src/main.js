@@ -39,22 +39,25 @@ const filterTripPoint = (tripPoints, filterValue) => {
           // point.isVisible = Boolean(point.timeStart > Date.now());
           point.isVisible = point.price > 200;
         }
-
       });
 
     case `Past`:
       return tripPoints.forEach((point) => {
+
         if (point !== null) {
           // point.isVisible = Boolean(point.timeEnd < Date.now());
           point.isVisible = point.price < 100;
         }
+
       });
 
     default:
       return tripPoints.forEach((point) => {
+
         if (point !== null) {
           point.isVisible = true;
         }
+
       });
   }
 };
@@ -84,7 +87,9 @@ const renderTripPoints = (entitiesTripPoints) => {
   const tripPoitsElements = [];
 
   entitiesTripPoints.forEach((pointEntity, i) => {
+
     if (pointEntity !== null && pointEntity.isVisible) {
+
       const tripPoint = new TripPoint(pointEntity);
       const editTripPoint = new TripPointEdit(pointEntity);
 
@@ -104,6 +109,7 @@ const renderTripPoints = (entitiesTripPoints) => {
         editTripPoint.unrender();
         // console.log(`after update tripPointsData`, entitiesTripPoints);
       };
+
 
       editTripPoint.onDelete = () => {
         // console.log(`pointEntity [${i}]`, pointEntity);
@@ -147,6 +153,7 @@ const getDataForStats = (allData, value = `count`) => {
 
   allData.forEach((it) => {
     if (it !== null && it.isVisible) {
+
       variableForConvert[it.type] = (variableForConvert[it.type] || 0) + (value === `count` ? 1 : it[value]);
     }
   });
