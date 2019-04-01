@@ -1,7 +1,7 @@
 import {filtersData, getTripPointsData} from './data.js';
 import {renderElements} from './utils.js';
 
-import {getStats, horizontalChart} from './statistics.js';
+import {horizontalChart} from './statistics.js';
 
 import {Filter} from './filters/filter.js';
 
@@ -21,6 +21,13 @@ const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
 const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointContainer = document.querySelector(`.trip-day__items`);
+
+const moneyCtx = document.querySelector(`.statistic__money`);
+const transportCtx = document.querySelector(`.statistic__transport`);
+
+let viewStatistics = false;
+let moneyStats;
+let transportStats;
 
 
 const filterTripPoint = (tripPoints, filterValue) => {
@@ -53,7 +60,7 @@ const renderFilters = (dataFilters) => {
     const filter = new Filter(data);
     filter.render();
     filterElements.push(filter.element);
-    filter.onFilter = (evt) => {
+    filter.onFilter = () => {
       // console.log(`onFilter`, evt);
       // не понятно что должна выполнять функция, обработчик фильтра на строке 108
     };
@@ -105,7 +112,8 @@ const renderTripPoints = (entitiesTripPoints) => {
 };
 
 
-const showStatistics = (value) => {
+const toggleVisibilityStatistics = (value) => {
+  viewStatistics = value;
   linkViewStatistics.classList.toggle(`view-switch__item--active`, value);
   statsContainer.classList.toggle(`visually-hidden`, !value);
 
@@ -113,61 +121,65 @@ const showStatistics = (value) => {
   tableContainer.classList.toggle(`visually-hidden`, value);
 };
 
-const getDataForStats = (allData) => {
+
+const renderStats = (allData) => {
+  if (moneyStats !== undefined) {
+    moneyStats.destroy();
+  }
+  if (transportStats !== undefined) {
+    transportStats.destroy();
+  }
+
+  moneyStats = horizontalChart(moneyCtx, `MY MONEY`, getDataForStats(allData, `price`), `€ `);
+  transportStats = horizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);
+};
+
+
+const getDataForStats = (allData, value = `count`) => {
   const variableForConvert = {};
 
   allData.forEach((it) => {
-    console.log(`${it.type} = ${it.price}`);
-    variableForConvert[it.type] = (variableForConvert[it.type] || 0) + it.price;
+    if (it.isVisible) {
+      variableForConvert[it.type] = (variableForConvert[it.type] || 0) + (value === `count` ? 1 : it[value]);
+    }
   });
-
-  console.log(variableForConvert);
 
   return {
     labels: Object.keys(variableForConvert).map((el) => `${typeTripPoint[el].icon} ${el.toUpperCase()}`),
     values: Object.values(variableForConvert)
-    // values: Object.values(variableForConvert).map((val) => `€ ${val}`)
   };
 };
+
 
 const init = () => {
   const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
   const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
-  console.log(tripPointsEntities);
+  // console.log(tripPointsEntities);
 
   renderFilters(filtersData);
   renderTripPoints(tripPointsEntities);
-
-  // renderTripPoints(tripPointsData);
 
   filtersContainer.addEventListener(`change`, (evt) => {
     tripPointContainer.innerHTML = ``;
     filterTripPoint(tripPointsEntities, evt.target.value);
     renderTripPoints(tripPointsEntities);
+
+    if (viewStatistics) {
+      renderStats(tripPointsEntities);
+    }
   });
 
   linkViewStatistics.addEventListener(`click`, (evt) => {
     evt.preventDefault();
-    showStatistics(true);
+    toggleVisibilityStatistics(true);
 
-    getDataForStats(tripPointsEntities, `type`);
-
-    const moneyCtx = document.querySelector(`.statistic__money`);
-    horizontalChart(moneyCtx, `MY MONEY`, getDataForStats(tripPointsEntities));
-
-    const transportCtx = document.querySelector(`.statistic__transport`);
-    horizontalChart(transportCtx, `TRANSPORT`, {
-      labels: [`🚗 DRIVE`, `🚕 RIDE`, `✈️ FLY`, `🛳️ SAIL`],
-      values: [4, 3, 2, 1]
-    });
-    // getStats();
+    renderStats(tripPointsEntities);
   });
 
   linkViewTable.addEventListener(`click`, (evt) => {
     evt.preventDefault();
-    showStatistics(false);
+    toggleVisibilityStatistics(false);
   });
-
 
 };
 

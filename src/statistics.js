@@ -6,13 +6,9 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 // const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
 
 // Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
-
 const BAR_HEIGHT = 55;
-// moneyCtx.height = BAR_HEIGHT * 6;
-// transportCtx.height = BAR_HEIGHT * 4;
-// timeSpendCtx.height = BAR_HEIGHT * 4;
 
-export const horizontalChart = (container, title, data) => {
+export const horizontalChart = (container, title, data, prefix) => {
   container.height = BAR_HEIGHT * data.labels.length;
 
   return new Chart(container, {
@@ -38,7 +34,7 @@ export const horizontalChart = (container, title, data) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `€ ${val}`
+          formatter: (val) => `${prefix}${val}`
         }
       },
       title: {
