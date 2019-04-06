@@ -1,16 +1,19 @@
 import {filtersData, getTripPointsData} from './data.js';
-import {renderElements} from './utils.js';
+
+import {API} from './api.js';
+
+import {renderElements, formatDate} from './utils.js';
 
 import {horizontalChart} from './statistics.js';
 
 import {Filter} from './filters/filter.js';
 
-import {typeTripPoint} from './trip-points/trip-point-constants.js';
+import {typeTripPoint, AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
 import {TripPointEntity} from './trip-points/trip-point-entity.js';
 import {TripPoint} from './trip-points/trip-point.js';
 import {TripPointEdit} from './trip-points/trip-point-edit.js';
 
-const NUMBER_TRIP_POINTS_ON_PAGE = 7;
+// const NUMBER_TRIP_POINTS_ON_PAGE = 7;
 // const MAX_TRIP_POINTS = 10;
 
 const tableContainer = document.getElementById(`table`);
@@ -20,7 +23,8 @@ const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`)
 const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
 const filtersContainer = document.querySelector(`.trip-filter`);
-const tripPointContainer = document.querySelector(`.trip-day__items`);
+const tripPointsContainer = document.querySelector(`.trip-points`);
+const oneDayTripPointsTemplate = tripPointsContainer.querySelector(`.trip-day`);
 
 const moneyCtx = document.querySelector(`.statistic__money`);
 const transportCtx = document.querySelector(`.statistic__transport`);
@@ -36,13 +40,13 @@ const filterTripPoint = (tripPoints, filterValue) => {
     case `Future`:
       return tripPoints.forEach((point) => {
         // point.isVisible = Boolean(point.timeStart > Date.now());
-        point.isVisible = point.price > 200;
+        point.isVisible = point.price >= 800;
       });
 
     case `Past`:
       return tripPoints.forEach((point) => {
         // point.isVisible = Boolean(point.timeEnd < Date.now());
-        point.isVisible = point.price < 100;
+        point.isVisible = point.price < 800;
       });
 
     default:
@@ -75,15 +79,35 @@ const renderTripPoints = (entitiesTripPoints) => {
   // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
 
   const tripPoitsElements = [];
+  let count = 0;
+  let currentDay;
+  // let oneDayTripPointContainer = oneDayTripPointsTemplate.cloneNode(true);
+  let oneDayTripPointContainer;
 
   entitiesTripPoints.forEach((pointEntity, i) => {
+    // console.log('pointEntity', pointEntity);
+    // console.log(formatDate(pointEntity.day, `DD MMM`));
+
+    if (currentDay !== pointEntity.day) {
+      oneDayTripPointContainer = oneDayTripPointsTemplate.cloneNode(true);
+      currentDay = pointEntity.day;
+      oneDayTripPointContainer.querySelector(`.trip-day__title`).textContent = formatDate(currentDay, `DD MMM`);
+
+      ++count;
+      oneDayTripPointContainer.querySelector(`.trip-day__number`).textContent = count;
+
+      tripPoitsElements.push(oneDayTripPointContainer);
+
+    }
+
     if (pointEntity.isVisible) {
+
       const tripPoint = new TripPoint(pointEntity);
       const editTripPoint = new TripPointEdit(pointEntity);
 
       tripPoint.onEdit = () => {
         editTripPoint.render();
-        tripPointContainer.replaceChild(editTripPoint.element, tripPoint.element);
+        oneDayItems.replaceChild(editTripPoint.element, tripPoint.element);
         tripPoint.unrender();
       };
 
@@ -93,9 +117,9 @@ const renderTripPoints = (entitiesTripPoints) => {
 
         tripPoint.update(updateDate);
         tripPoint.render();
-        tripPointContainer.replaceChild(tripPoint.element, editTripPoint.element);
+        oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
         editTripPoint.unrender();
-        // console.log(`after update tripPointsData`, entitiesTripPoints);
+        console.log(`after update tripPointsData`, entitiesTripPoints);
       };
 
       editTripPoint.onDelete = () => {
@@ -104,11 +128,15 @@ const renderTripPoints = (entitiesTripPoints) => {
         editTripPoint.unrender();
       };
 
-      tripPoitsElements.push(tripPoint.render());
+      const oneDayItems = oneDayTripPointContainer.querySelector(`.trip-day__items`);
+      oneDayItems.appendChild(tripPoint.render());
+
+      // tripPoitsElements.push(tripPoint.render());
     }
+
   });
 
-  renderElements(tripPointContainer, tripPoitsElements);
+  renderElements(tripPointsContainer, tripPoitsElements);
 };
 
 
@@ -150,36 +178,54 @@ const getDataForStats = (allData, value = `count`) => {
   };
 };
 
+// не факт что нужгл
+const sortByDay = (array) => {
+  array.sort((a, b) => {
+    console.log(a.timeStart, b.timeStart);
+    return a.timeStart - b.timeStart;
+  });
+};
+
 
 const init = () => {
-  const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
-  const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
+  // const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
+  // const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
   // console.log(tripPointsEntities);
-
   renderFilters(filtersData);
-  renderTripPoints(tripPointsEntities);
 
-  filtersContainer.addEventListener(`change`, (evt) => {
-    tripPointContainer.innerHTML = ``;
-    filterTripPoint(tripPointsEntities, evt.target.value);
+  const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+
+  api.getPoints()
+  .then((data) => {
+    // console.log('getPoints', data);
+    const tripPointsEntities = data.map((it) => new TripPointEntity(it));
     renderTripPoints(tripPointsEntities);
 
-    if (viewStatistics) {
+    filtersContainer.addEventListener(`change`, (evt) => {
+      tripPointsContainer.innerHTML = ``;
+      filterTripPoint(tripPointsEntities, evt.target.value);
+      renderTripPoints(tripPointsEntities);
+
+      if (viewStatistics) {
+        renderStats(tripPointsEntities);
+      }
+    });
+
+    linkViewStatistics.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      toggleVisibilityStatistics(true);
+
       renderStats(tripPointsEntities);
-    }
+    });
+
+    linkViewTable.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      toggleVisibilityStatistics(false);
+    });
   });
 
-  linkViewStatistics.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-    toggleVisibilityStatistics(true);
 
-    renderStats(tripPointsEntities);
-  });
-
-  linkViewTable.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-    toggleVisibilityStatistics(false);
-  });
+  // renderTripPoints(tripPointsEntities);
 
 };
 

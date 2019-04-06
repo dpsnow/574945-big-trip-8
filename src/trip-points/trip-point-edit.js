@@ -5,7 +5,7 @@ import {isFunction, createElement, renderElements} from '../utils.js';
 import {Component} from '../component.js';
 import {getTemplate, renderAllOffers} from '../template/trip-point-edit-template.js';
 import {TripPointEntity} from './trip-point-entity.js';
-import {typeTripPoint} from '../trip-points/trip-point-constants.js';
+import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_green.css';
@@ -13,16 +13,17 @@ import '../../node_modules/flatpickr/dist/themes/material_green.css';
 class TripPointEdit extends Component {
   constructor(data) {
     super();
+    this._id = data.id;
     this._icon = data.icon;
     this._type = data.type;
     this._destination = data.destination;
-    this._day = data.day;
+    // this._day = data.day;
     this._timeStart = data.timeStart;
     this._timeEnd = data.timeEnd;
     this._times = data.times;
     this._price = data.price;
     this._addedOffers = data.addedOffers;
-    this._allOffers = data.allOffers;
+    // this._allOffers = data.allOffers;
     this._picture = data.picture;
     this._isFavorite = data.isFavorite;
     this._description = data.description;
@@ -30,6 +31,7 @@ class TripPointEdit extends Component {
     this._onSubmitBtnClick = this._onSubmitBtnClick.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
     this._onChangeType = this._onChangeType.bind(this);
+    this._onChangeDestination = this._onChangeDestination.bind(this);
   }
 
   get template() {
@@ -87,18 +89,37 @@ class TripPointEdit extends Component {
 
   }
 
+  _onChangeDestination(evt) {
+    this._destination = evt.target.value;
+    const destinationContainer = this._element.querySelector(`.point__destination`);
+    destinationContainer.querySelector(`.point__destination-text`).textContent = Destinations[this._destination].description;
+
+    const oldPictures = destinationContainer.querySelector(`.point__destination-images`);
+    const newPictures = document.createElement(`div`);
+    newPictures.classList.add(`point__destination-images`);
+    const elements = createElement(Destinations[this._destination].pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``));
+    renderElements(newPictures, elements);
+
+    destinationContainer.replaceChild(newPictures, oldPictures);
+  }
+
   _initFlatpickr() {
-    const inputTime = this._element.querySelector(`.point__time .point__input`);
-    flatpickr(inputTime, {
-      mode: `range`,
+    const inputTimeFrom = this._element.querySelector(`.point__input[name="date-start"]`);
+    const inputTimeTo = this._element.querySelector(`.point__input[name="date-end"]`);
+    flatpickr(inputTimeFrom, {
       enableTime: true,
       altFormat: `H:i`,
       [`time_24hr`]: true,
       altInput: true,
-      dateFormat: `U`,
-      locale: {
-        rangeSeparator: ` — `
-      },
+      dateFormat: `U`
+    });
+
+    flatpickr(inputTimeTo, {
+      enableTime: true,
+      altFormat: `H:i`,
+      [`time_24hr`]: true,
+      altInput: true,
+      dateFormat: `U`
     });
   }
 
@@ -107,6 +128,7 @@ class TripPointEdit extends Component {
     this._element.querySelector(`.point form`).addEventListener(`reset`, this._onResetBtnClick);
     this._element.querySelector(`.point form`).addEventListener(`submit`, this._onSubmitBtnClick);
     this._element.querySelectorAll(`.travel-way__select-input`).forEach((elem) => elem.addEventListener(`change`, this._onChangeType));
+    this._element.querySelector(`.point__destination-input`).addEventListener(`change`, this._onChangeDestination);
   }
 
   unbind() {

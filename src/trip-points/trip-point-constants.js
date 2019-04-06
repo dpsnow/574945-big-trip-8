@@ -1,68 +1,100 @@
-const Offers = {
-  luggage: `Add luggage`,
-  comfortClass: `Switch to comfort class`,
-  meal: `Add meal`,
-  seats: `Choose seats`,
-  insurance: `Add insurance`,
-  parking: `Parking`,
-  fuel: `Add fuel`,
-  cleaning: `Cleaning room`,
-  ticket: `Add entrance ticket`,
-  souvenirs: `Add souvenirs`,
-  tips: `Tips`,
-};
+import {API} from '../api.js';
 
-const typeTripPoint = {
+const AUTHORIZATION = `Basic dXNtfk5BwYXNz0D29gZAo=0`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+
+let Offers = {};
+let Destinations = {};
+
+let typeTripPoint = {
   'taxi': {
     icon: `🚕`,
     text: `Taxi to`,
-    offers: [`luggage`, `comfortClass`, `tips`]
   },
   'bus': {
     icon: `🚌`,
     text: `Bus to`,
-    offers: [`luggage`, `comfortClass`, `meal`],
   },
   'train': {
     icon: `🚂`,
     text: `Train to`,
-    offers: [`luggage`, `comfortClass`, `meal`],
   },
   'ship': {
     icon: `🛳️`,
     text: `Ship to`,
-    offers: [`luggage`, `comfortClass`, `meal`]
   },
   'transport': {
     icon: `🚊`,
     text: `Transport to`,
-    offers: [`luggage`, `comfortClass`]
   },
   'drive': {
     icon: `🚗`,
     text: `Drive to`,
-    offers: [`insurance`, `fuel`, `parking`],
   },
   'flight': {
     icon: `✈️`,
     text: `Flight to`,
-    offers: [`luggage`, `comfortClass`, `meal`, `seats`]
   },
   'sightseeing': {
     icon: `🏛️`,
     text: `Sightseeing to`,
-    offers: [`ticket`, `souvenirs`],
   },
   'check-in': {
     icon: `🏨`,
     text: `Check-in`,
-    offers: [`luggage`, `cleaning`],
   },
   'restaurant': {
     icon: `🍴`,
     text: `Restaurant in`,
-    offers: [`tips`, `parking`],
   },
 };
 
-export {typeTripPoint, Offers};
+
+api.getOffers()
+.then((inputOffers) => {
+  // console.log(inputOffers);
+  inputOffers.forEach((it) => {
+    typeTripPoint[it.type].offers = it.offers;
+  });
+})
+.then(() => console.log('typeTripPoint', typeTripPoint));
+
+
+api.getDestinations()
+.then((inputDestinations) => {
+  console.log('inputDestinations', inputDestinations);
+  inputDestinations.forEach((it) => {
+    Destinations[it.name] = {};
+    Destinations[it.name].description = it.description;
+    Destinations[it.name].pictures = it.pictures;
+  });
+});
+// .then(() => console.log('Destinations', Destinations));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export {AUTHORIZATION, END_POINT, typeTripPoint, Offers, Destinations};
