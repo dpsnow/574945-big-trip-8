@@ -19,7 +19,7 @@ export const renderAllOffers = (point) => {
     <input class="point__offers-input visually-hidden" type="checkbox" id="${point._id}-${index}" name="offer" value="${offer.title}; price:${offer.price}"
     ${offer.accepted ? `checked` : ``}>
     <label for="${point._id}-${index}" class="point__offers-label">
-      <span class="point__offer-service">${offer.title}</span> + €<span class="point__offer-price">${offer.price}</span>
+      <span class="point__offer-service">${offer.title || offer.name}</span> + €<span class="point__offer-price">${offer.price}</span>
     </label>
     `;
   }).join(``);
@@ -27,7 +27,7 @@ export const renderAllOffers = (point) => {
 
 export const getTemplate = (point) => {
   console.log('from TripPointEdit', point);
-  console.log('Destinations', Destinations);
+  // console.log('Destinations', Destinations);
   return `
   <article class="point">
   <form action="" method="get">
@@ -52,7 +52,7 @@ export const getTemplate = (point) => {
 
       <div class="point__destination-wrap">
         <label class="point__destination-label" for="destination">${typeTripPoint[point._type].text}</label>
-        <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination}" name="destination">
+        <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination.name}" name="destination">
         <datalist id="destination-select">
           <option value="airport"></option>
           <option value="hotel"></option>
@@ -98,9 +98,9 @@ export const getTemplate = (point) => {
       </section>
       <section class="point__destination">
         <h3 class="point__details-title">Destination</h3>
-        <p class="point__destination-text">${Destinations[point._destination].description}</p>
+        <p class="point__destination-text">${point._destination.description}</p>
         <div class="point__destination-images">
-         ${Destinations[point._destination].pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``)}
+         ${point._destination.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``)}
         </div>
       </section>
       <input type="hidden" class="point__total-price" name="total-price" value="">

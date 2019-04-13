@@ -1,4 +1,5 @@
 import flatpickr from 'flatpickr';
+import moment from 'moment';
 
 import {isFunction, createElement, renderElements} from '../utils.js';
 
@@ -14,19 +15,24 @@ class TripPointEdit extends Component {
   constructor(data) {
     super();
     this._id = data.id;
-    this._icon = data.icon;
-    this._type = data.type;
-    this._destination = data.destination;
-    // this._day = data.day;
     this._timeStart = data.timeStart;
     this._timeEnd = data.timeEnd;
-    this._times = data.times;
+    this._type = data.type;
+    this._destination = data.destination;
+    this._isFavorite = data.isFavorite;
     this._price = data.price;
     this._addedOffers = data.addedOffers;
+
+
+    this._icon = data.icon;
+
+    // this._day = data.day;
+
     // this._allOffers = data.allOffers;
-    this._picture = data.picture;
-    this._isFavorite = data.isFavorite;
-    this._description = data.description;
+    // this._description = data.description;
+    // this._picture = data.picture;
+
+    this._isNewTripPoint = data.isNewTripPoint;
 
     this._onSubmitBtnClick = this._onSubmitBtnClick.bind(this);
     this._onResetBtnClick = this._onResetBtnClick.bind(this);
@@ -55,24 +61,70 @@ class TripPointEdit extends Component {
       this._onSubmit(updateDate);
     }
 
-    this.update(updateDate);
+    // this.update(updateDate);
     return updateDate;
+  }
+
+  _convertDate(formData) {
+    const convertedData = {};
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      // console.log('[property, value] = ', pair);
+      if (!value) {
+        continue;
+      }
+      // console.log(`newDate[_${property}_] = ${value}`);
+
+      if (convertedData[property]) {
+        convertedData[property] = [].concat(convertedData[property]).concat(value);
+      } else {
+        convertedData[property] = value;
+      }
+    }
+    console.log('convertedData', convertedData);
+    // return new TripPointEntity(convertedData);
+    return {
+      'base_price': convertedData[`price`],
+      'date_from': moment(convertedData[`date-start`], `X`).valueOf(),
+      'date_to': moment(convertedData[`date-end`], `X`).valueOf(),
+      'destination': {
+        name: convertedData[`destination`],
+        description: Destinations[convertedData[`destination`]].description,
+        pictures: Destinations[convertedData[`destination`]].pictures
+      },
+      'id': this._id,
+      'is_favorite': Boolean(convertedData[`favorite`]),
+      'offers': this._addedOffers,
+      'type': convertedData[`travel-way`]
+    };
+
   }
 
   _onResetBtnClick(evt) {
     evt.preventDefault();
-    if (isFunction(this._onDelete)) {
+    console.log('_onResetBtnClick');
+
+    if (this._isNewTripPoint) {
+      this.unrender();
+    } else if (isFunction(this._onDelete)) {
       this._onDelete();
     }
   }
-
 
   _updateOffers() {
     const offersContainer = this._element.querySelector(`.point__offers`);
     const oldOffers = this._element.querySelector(`.point__offers-wrap`);
     const newOffer = document.createElement(`div`);
     newOffer.classList.add(`point__offers-wrap`);
-    const elements = createElement(renderAllOffers(this));
+    this._addedOffers = typeTripPoint[this._type].offers;
+
+    const elements = createElement(this._addedOffers.map((offer, index) => `<input class="point__offers-input visually-hidden" type="checkbox" id="${index}" name="offer" value="title:${offer.title || offer.name}; price:${offer.price}"
+    ${offer.accepted ? `checked` : ``}>
+    <label for="${index}" class="point__offers-label">
+      <span class="point__offer-service">${offer.name}</span> + €<span class="point__offer-price">${offer.price}</span>
+    </label>`)
+    .join(``));
     renderElements(newOffer, elements);
 
     offersContainer.replaceChild(newOffer, oldOffers);
@@ -106,7 +158,10 @@ class TripPointEdit extends Component {
   _initFlatpickr() {
     const inputTimeFrom = this._element.querySelector(`.point__input[name="date-start"]`);
     const inputTimeTo = this._element.querySelector(`.point__input[name="date-end"]`);
-    flatpickr(inputTimeFrom, {
+
+    const timeStart = flatpickr(inputTimeFrom, {
+      // maxDate: moment(inputTimeTo.value, `X`).format(`YYYY-MM-DD`),
+      // maxTime: moment(inputTimeTo.value, `X`).format(`HH:mm`),
       enableTime: true,
       altFormat: `H:i`,
       [`time_24hr`]: true,
@@ -114,13 +169,27 @@ class TripPointEdit extends Component {
       dateFormat: `U`
     });
 
-    flatpickr(inputTimeTo, {
+    const timeEnd = flatpickr(inputTimeTo, {
+      minDate: moment(inputTimeFrom.value, `X`).format(`YYYY-MM-DD`),
+      minTime: moment(inputTimeFrom.value, `X`).format(`HH:mm`),
       enableTime: true,
       altFormat: `H:i`,
       [`time_24hr`]: true,
       altInput: true,
       dateFormat: `U`
     });
+
+    inputTimeFrom.addEventListener(`change`, (evt) => {
+      console.log(moment(evt.target.value, `X`).format(`YYYY-MM-DD`));
+      timeEnd.set(`minDate`, moment(evt.target.value, `X`).format(`YYYY-MM-DD`));
+      timeEnd.set(`minTime`, moment(evt.target.value, `X`).format(`HH:mm`));
+      timeEnd.redraw();
+    });
+
+    // inputTimeTo.addEventListener(`change`, (evt) => {
+    //   timeStart.set(`maxDate`, moment(evt.target.value, `X`).format(`YYYY-MM-DD`));
+    //   timeStart.set(`maxTime`, moment(evt.target.value, `X`).format(`HH:mm`));
+    // });
   }
 
   bind() {
@@ -136,38 +205,22 @@ class TripPointEdit extends Component {
     this._element.removeEventListener(`click`, this._onResetBtnClick);
   }
 
-  _convertDate(formData) {
-    const convertedData = {};
 
-    for (const pair of formData.entries()) {
-      const [property, value] = pair;
-      // console.log('[property, value] = ', pair);
-      if (!value) {
-        continue;
-      }
-      // console.log(`newDate[_${property}_] = ${value}`);
-      if (convertedData[property]) {
-        convertedData[property] = [].concat(convertedData[property]).concat(value);
-      } else {
-        convertedData[property] = value;
-      }
-    }
-    return new TripPointEntity(convertedData);
-  }
 
-  update({icon, type, destination, day, timeStart, timeEnd, times, price, addedOffers, picture, description, isFavorite}) {
-    this._icon = icon;
-    this._type = type;
-    this._destination = destination;
-    this._day = day;
-    this._timeStart = timeStart;
-    this._timeEnd = timeEnd;
-    this._times = times;
-    this._price = price;
-    this._addedOffers = addedOffers;
-    this._picture = picture;
-    this._description = description;
-    this._isFavorite = isFavorite;
+  update(newData) {
+    this._timeStart = newData.timeStart;
+    this._timeEnd = newData.timeEnd;
+    this._type = newData.type;
+    this._destination = newData.destination;
+    this._isFavorite = newData.isFavorite;
+    this._price = newData.price;
+    this._addedOffers = newData.offers;
+
+    this._icon = newData.icon;
+    this._day = newData.day;
+
+    // this._picture = newData.picture;
+    // this._description = newData.description;
   }
 
 }

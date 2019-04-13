@@ -14,7 +14,7 @@ export const getTemplate = (point) => {
       <span class="trip-point__timetable">${point.times}</span>
       <span class="trip-point__duration">${point.duration}</span>
     </p>
-    <p class="trip-point__price">&euro;&nbsp;${point._price}</p>
+    <p class="trip-point__price">&euro;&nbsp;${point._totalPrice}</p>
     <ul class="trip-point__offers">
       ${getCheckedOffer(point)}
     </ul>

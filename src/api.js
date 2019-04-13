@@ -23,6 +23,17 @@ const API = class {
     this._authorization = authorization;
   }
 
+  _load({url, method = Method.GET, body = null, headers = new Headers()}) {
+    headers.append(`Authorization`, this._authorization);
+
+    return fetch(`${this._endPoint}/${url}`, {method, body, headers})
+      .then(checkStatus)
+      .catch((err) => {
+        console.error(`fetch error: ${err}`);
+        throw err;
+      });
+  }
+
   getPoints() {
     return this._load({url: `points`})
       .then(toJSON);
@@ -40,7 +51,7 @@ const API = class {
 
   createTask({task}) {
     return this._load({
-      url: `tasks`,
+      url: `points`,
       method: Method.POST,
       body: JSON.stringify(task),
       headers: new Headers({'Content-Type': `application/json`})
@@ -48,9 +59,10 @@ const API = class {
       .then(toJSON);
   }
 
-  updateTask({id, data}) {
+  updateTask(data) {
+    console.log(data);
     return this._load({
-      url: `tasks/${id}`,
+      url: `points/${data.id}`,
       method: Method.PUT,
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
@@ -58,20 +70,11 @@ const API = class {
       .then(toJSON);
   }
 
-  deleteTask({id}) {
-    return this._load({url: `tasks/${id}`, method: Method.DELETE});
+  deleteTask(id) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
-  _load({url, method = Method.GET, body = null, headers = new Headers()}) {
-    headers.append(`Authorization`, this._authorization);
 
-    return fetch(`${this._endPoint}/${url}`, {method, body, headers})
-      .then(checkStatus)
-      .catch((err) => {
-        console.error(`fetch error: ${err}`);
-        throw err;
-      });
-  }
 };
 
 export {API};
