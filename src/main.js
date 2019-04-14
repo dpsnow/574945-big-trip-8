@@ -3,6 +3,7 @@ import {Filter} from './filters/filter.js';
 
 import {API} from './api.js';
 import {renderElements, formatDate} from './utils.js';
+import {updateGeneralInfo} from './utils/update-general-info.js';
 
 import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
@@ -18,28 +19,7 @@ const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointsContainer = document.querySelector(`.trip-points`);
 const oneDayTripPointsTemplate = tripPointsContainer.querySelector(`.trip-day`);
 
-const tripSchedule = document.querySelector(`.trip__points`);
-const tripTotalCost = document.querySelector(`.trip__total-cost`);
-const tripDates = document.querySelector(`.trip__dates`);
-
 let viewStatistics = false;
-
-const updateGeneralInfo = (entitiesTripPoints) => {
-  tripTotalCost.textContent = `€ ${entitiesTripPoints.reduce((accumulator, currentValue) => {
-    return accumulator + currentValue.totalPrice;
-  }, 0)}`;
-  const cites = new Set(entitiesTripPoints.map((tripPoint) => tripPoint.destination.name));
-  tripSchedule.textContent = [...cites].join(` — `);
-
-
-  // TODO: разбить на разные функции вызывать только нужное
-  // tripDates.textContent = `Mar 17&nbsp;&mdash; 19`;
-  tripDates.innerHTML = `${formatDate(entitiesTripPoints[0].timeStart, `DD MMM`)}&nbsp;&mdash; 19`;
-
-
-  // tripSchedule.textContent = [entitiesTripPoints[0].destination.name, ...cites, entitiesTripPoints[entitiesTripPoints.length - 1].destination.name].join(` — `);
-};
-
 
 const filterTripPoint = (tripPoints, filterValue) => {
   // фильтрация по времени заменена на фильтрацию по цене для удобства
@@ -151,7 +131,7 @@ const renderTripPoints = (entitiesTripPoints) => {
           tripPoint.update(entitiesTripPoints[i]);
           // console.log(`after update tripPointsData`, entitiesTripPoints);
         })
-        .then(updateGeneralInfo(entitiesTripPoints))
+        .then(updateGeneralInfo(entitiesTripPoints, `totalPrice`))
         .catch(() => {
           // console.log('Нужно потрясти карточку и не закрывать');
           tripPoint.element.classList.add(`shake`);
@@ -173,7 +153,7 @@ const renderTripPoints = (entitiesTripPoints) => {
           // console.log(`after update tripPointsData`, entitiesTripPoints);
           // isEditMode = false;
         })
-        .then(updateGeneralInfo(entitiesTripPoints))
+        .then(updateGeneralInfo(entitiesTripPoints, `all`))
         .catch(() => {
           // console.error(`Ошибка при обновлении`);
 
@@ -247,12 +227,13 @@ const init = () => {
   .then((data) => {
     // console.log('getPoints', data);
     const tripPointsEntities = data.map((it) => new TripPointEntity(it));
+    // console.log('tripPointsEntities', tripPointsEntities);
 
 
     tripPointsContainer.innerHTML = ``;
     renderTripPoints(tripPointsEntities);
 
-    updateGeneralInfo(tripPointsEntities);
+    updateGeneralInfo(tripPointsEntities, `all`);
 
     renderFilters(filtersData);
 

@@ -18,7 +18,6 @@ class TripPointEntity {
     this.offers = data[`offers`];
   }
 
-
   get icon() {
     return typeTripPoint[this.type].icon;
   }
