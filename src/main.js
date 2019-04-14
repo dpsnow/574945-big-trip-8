@@ -22,41 +22,10 @@ const oneDayTripPointsTemplate = tripPointsContainer.querySelector(`.trip-day`);
 
 let viewStatistics = false;
 
-const filterTripPoint = (tripPoints, filterValue) => {
-  // фильтрация по времени заменена на фильтрацию по цене для удобства
-  switch (filterValue) {
-    case `Future`:
-      return tripPoints.forEach((point) => {
-        // point.isVisible = Boolean(point.timeStart > Date.now());
-        if (point === null) {
-          return;
-        }
-
-        point.isVisible = point.price >= 1000;
-      });
-
-    case `Past`:
-      return tripPoints.forEach((point) => {
-        // point.isVisible = Boolean(point.timeEnd < Date.now());
-        if (point === null) {
-          return;
-        }
-
-        point.isVisible = point.price < 1000;
-      });
-
-    default:
-      return tripPoints.forEach((point) => {
-        if (point === null) {
-          return;
-        }
-        point.isVisible = true;
-      });
-  }
-};
 
 const renderTripPoints = (entitiesTripPoints) => {
-  // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
+  console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
+  tripPointsContainer.innerHTML = ``;
 
   const tripPoitsElements = [];
   let count = 0;
@@ -64,11 +33,11 @@ const renderTripPoints = (entitiesTripPoints) => {
   // let isEditMode;
   let oneDayTripPointContainer;
 
-  entitiesTripPoints.forEach((pointEntity, i) => {
+  entitiesTripPoints.data.forEach((pointEntity, i) => {
     // console.log('pointEntity', pointEntity);
     // console.log(formatDate(pointEntity.day, `DD MMM`));
 
-    if (pointEntity === null) {
+    if (pointEntity === null || pointEntity.destination === undefined) {
       return;
     }
 
@@ -92,7 +61,7 @@ const renderTripPoints = (entitiesTripPoints) => {
         // if (isEditMode) {
         //   editTripPoint.onCancelEditMode();
         // }
-        editTripPoint.update(entitiesTripPoints[i]);
+        editTripPoint.update(pointEntity);
         editTripPoint.render();
         oneDayItems.replaceChild(editTripPoint.element, tripPoint.element);
         tripPoint.unrender();
@@ -102,69 +71,42 @@ const renderTripPoints = (entitiesTripPoints) => {
       };
 
       tripPoint.onAddOffer = () => {
-        tripPoint.update(entitiesTripPoints[i]);
+        // tripPoint.update(entitiesTripPoints[i]);
         // console.log(`updateDate [${i}]`);
-        tripPoint.element.classList.remove(`shake`);
 
-        // data преобразованная для сервера
-        api.updateTask(tripPoint.toRaw)
-        .then((task) => {
-          entitiesTripPoints[i].update(task);
-          tripPoint.update(entitiesTripPoints[i]);
-          // console.log(`after update tripPointsData`, entitiesTripPoints);
-        })
-        .then(updateGeneralInfo(entitiesTripPoints, `totalPrice`))
-        .catch(() => {
-          // console.log('Нужно потрясти карточку и не закрывать');
-          tripPoint.element.classList.add(`shake`);
-        });
+        return entitiesTripPoints.update(tripPoint.toRaw)
+            .then((updatedData) => {
+              // console.log(' tripPoint.onAddOffer', updatedData);
+              entitiesTripPoints.data[i].update(updatedData);
+              tripPoint.update(entitiesTripPoints.data[i]);
+              updateGeneralInfo(entitiesTripPoints.generalInfo, `totalPrice`);
+            });
       };
 
-      editTripPoint.onSubmit = (updateDate) => {
+      editTripPoint.onSubmit = (newData) => {
         // console.log(`updateDate [${i}]`, updateDate);
-        editTripPoint.element.classList.remove(`shake`);
+        return entitiesTripPoints.update(newData)
+            .then((updatedData) => {
+              entitiesTripPoints.data[i].update(updatedData);
 
-        api.updateTask(updateDate)
-        .then((task) => {
-          // console.log('api.updateTask', task);
-          entitiesTripPoints[i].update(task);
-          tripPoint.update(entitiesTripPoints[i]);
-          tripPoint.render();
-          oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
-          editTripPoint.unrender();
-          // console.log(`after update tripPointsData`, entitiesTripPoints);
-          // isEditMode = false;
-        })
-        .then(updateGeneralInfo(entitiesTripPoints, `all`))
-        .catch(() => {
-          // console.error(`Ошибка при обновлении`);
-
-          editTripPoint.element.classList.add(`shake`);
-          editTripPoint.element.querySelector(`button[type=submit]`).textContent = `Save`;
-          editTripPoint.element.querySelector(`button[type=submit]`).disabled = false;
-          editTripPoint.element.querySelector(`button[type=reset]`).disabled = false;
-        });
-
+              tripPoint.update(entitiesTripPoints.data[i]);
+              tripPoint.render();
+              oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
+              editTripPoint.unrender();
+              updateGeneralInfo(entitiesTripPoints.generalInfo, `all`);
+            });
       };
 
       editTripPoint.onDelete = () => {
-        // console.log(`onDelete [${i}]`, entitiesTripPoints[i]);
-        editTripPoint.element.classList.remove(`shake`);
-        api.deleteTask(entitiesTripPoints[i].id)
-        .then(() => {
-          entitiesTripPoints[i] = null;
-          editTripPoint.unrender();
-          // обновить шапку проекта
-          updateGeneralInfo(entitiesTripPoints);
-          // isEditMode = false;
-          // console.log(`after delete tripPointsData`, entitiesTripPoints);
-        })
-        .catch(() => {
-          editTripPoint.element.classList.add(`shake`);
-          editTripPoint.element.querySelector(`button[type=reset]`).textContent = `Delete`;
-          editTripPoint.element.querySelector(`button[type=submit]`).disabled = false;
-          editTripPoint.element.querySelector(`button[type=reset]`).disabled = false;
-        });
+        // console.log(`onDelete [${i}]`, entitiesTripPoints.data[i]);
+
+        return entitiesTripPoints.delete(entitiesTripPoints.data[i].id)
+            .then(() => {
+              // console.log(' entitiesTripPoints.update', updatedData);
+              delete entitiesTripPoints.data[i];
+              // editTripPoint.unrender();
+              updateGeneralInfo(entitiesTripPoints.generalInfo);
+            });
       };
 
       editTripPoint.onCancelEditMode = () => {
@@ -206,10 +148,11 @@ const init = () => {
     // console.log('tripPointsEntities', tripPointsEntities);
     console.log('tripPointsEntities0', tripPointsEntities0);
 
-    tripPointsContainer.innerHTML = ``;
-    renderTripPoints(tripPointsEntities);
+    // tripPointsContainer.innerHTML = ``;
+    // renderTripPoints(tripPointsEntities);
+    renderTripPoints(tripPointsEntities0);
 
-    updateGeneralInfo(tripPointsEntities, `all`);
+    updateGeneralInfo(tripPointsEntities0.generalInfo);
 
     // renderFilters(filtersData);
     renderFilters(filtersContainer);
@@ -219,23 +162,23 @@ const init = () => {
     // сортировка
     document.querySelector(`.trip-sorting`).addEventListener(`change`, (evt) => {
       // console.log('Сортировка по ', evt.target.value);
-      tripPointsContainer.innerHTML = ``;
+      // tripPointsContainer.innerHTML = ``;
       tripPointsEntities0.sort(evt.target.value);
-      renderTripPoints(tripPointsEntities0.data);
+      renderTripPoints(tripPointsEntities0);
     });
 
     // фильтрация по времени
     filtersContainer.addEventListener(`change`, (evt) => {
-      tripPointsContainer.innerHTML = ``;
+      // tripPointsContainer.innerHTML = ``;
 
       tripPointsEntities0.filter(evt.target.value);
       // filterTripPoint(tripPointsEntities, evt.target.value);
 
       if (viewStatistics) {
-        updateStats(tripPointsEntities);
+        updateStats(tripPointsEntities0.data);
       } else {
         // renderTripPoints(tripPointsEntities);
-        renderTripPoints(tripPointsEntities0.data);
+        renderTripPoints(tripPointsEntities0);
       }
     });
 
@@ -250,27 +193,24 @@ const init = () => {
     linkViewTable.addEventListener(`click`, (evt) => {
       evt.preventDefault();
       viewStatistics = toggleVisibilityStatistics(false);
-      renderTripPoints(tripPointsEntities);
+      renderTripPoints(tripPointsEntities0);
     });
 
     // создание новой точки путешествия
     document.querySelector(`.trip-controls__new-event`).addEventListener(`click`, () => {
 
-      const fakeDataForNewPoint = {
-        _isVisible: true,
-        isNewTripPoint: true,
-        id: 9999,
-        [`date_from`]: ``,
-        [`date_to`]: ``,
-        type: `taxi`,
-        destination: {name: `Moscow`, description: ``, pictures: []},
-        [`is_favorite`]: false,
-        [`base_price`]: 0,
-        offers: [],
+      const newPointEntity = new TripPointEntity(tripPointsEntities0.dataForNewTripPoint);
+      const editTripPointNew = new TripPointEdit(newPointEntity);
+
+      editTripPointNew.onSubmit = (newData) => {
+        // console.log(newData);
+        return tripPointsEntities0.add(newData)
+        .then(() => {
+          editTripPointNew.unrender();
+        });
+
       };
 
-      const newPointEntity = new TripPointEntity(fakeDataForNewPoint);
-      const editTripPointNew = new TripPointEdit(newPointEntity);
       // console.log(newPointEntity);
       // console.log(editTripPointNew);
       // editTripPointNew.render();

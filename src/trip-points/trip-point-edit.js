@@ -60,24 +60,6 @@ class TripPointEdit extends Component {
     this._onCancelEditMode = fn;
   }
 
-  _onSubmitBtnClick(evt) {
-    evt.preventDefault();
-    const newDate = new FormData(evt.target);
-    const updateDate = this._convertDate(newDate);
-
-    this._element.querySelector(`button[type=reset]`).disabled = true;
-    this._element.querySelector(`button[type=submit]`).disabled = true;
-
-    this._element.querySelector(`button[type=submit]`).textContent = `Saving....`;
-
-    if (isFunction(this._onSubmit)) {
-      this._onSubmit(updateDate);
-    }
-
-    // this.update(updateDate);
-    return updateDate;
-  }
-
   _onESCkeydown(evt) {
     const ESC_KEYCODE = 27;
     if (evt.keyCode === ESC_KEYCODE && isFunction(this._onCancelEditMode)) {
@@ -125,29 +107,59 @@ class TripPointEdit extends Component {
       'date_to': moment(convertedData[`date-end`], `X`).valueOf(),
       'destination': {
         name: convertedData[`destination`],
-        description: Destinations[convertedData[`destination`]].description,
-        pictures: Destinations[convertedData[`destination`]].pictures
+        description: Destinations[convertedData[`destination`]].description || ``,
+        pictures: Destinations[convertedData[`destination`]].pictures || []
       },
       'id': this._id,
       'is_favorite': Boolean(convertedData[`favorite`]),
       'offers': this._offers,
       'type': convertedData[`travel-way`]
     };
+  }
 
+  _onSubmitBtnClick(evt) {
+    evt.preventDefault();
+
+    const newDate = new FormData(evt.target);
+    const updateDate = this._convertDate(newDate);
+
+    this._element.classList.toggle(`shake`, false);
+    this._element.querySelector(`button[type=reset]`).disabled = true;
+    this._element.querySelector(`button[type=submit]`).disabled = true;
+    this._element.querySelector(`button[type=submit]`).textContent = `Saving....`;
+
+    if (isFunction(this._onSubmit)) {
+      this._onSubmit(updateDate)
+      .catch(() => {
+        this._element.classList.toggle(`shake`, true);
+        this._element.querySelector(`button[type=submit]`).textContent = `Save`;
+        this._element.querySelector(`button[type=submit]`).disabled = false;
+        this._element.querySelector(`button[type=reset]`).disabled = false;
+      });
+    }
   }
 
   _onResetBtnClick(evt) {
     evt.preventDefault();
 
+    this._element.classList.toggle(`shake`, false);
     this._element.querySelector(`button[type=reset]`).disabled = true;
     this._element.querySelector(`button[type=submit]`).disabled = true;
-
     this._element.querySelector(`button[type=reset]`).textContent = `Deleting...`;
 
     if (this._isNewTripPoint) {
       this.unrender();
     } else if (isFunction(this._onDelete)) {
-      this._onDelete();
+      this._onDelete()
+      .then(() => {
+        this.unrender();
+      })
+      .catch(() => {
+        this._element.classList.toggle(`shake`, true);
+        this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
+        this._element.querySelector(`button[type=submit]`).disabled = false;
+        this._element.querySelector(`button[type=reset]`).disabled = false;
+      });
     }
   }
 

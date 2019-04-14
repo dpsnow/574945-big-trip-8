@@ -49,7 +49,7 @@ const API = class {
       .then(toJSON);
   }
 
-  createTask({task}) {
+  createTask(task) {
     return this._load({
       url: `points`,
       method: Method.POST,

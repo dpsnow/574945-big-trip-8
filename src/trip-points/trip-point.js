@@ -25,7 +25,7 @@ class TripPoint extends Component {
   }
 
   get duration() {
-    const durationInDays = this._duration.days() ? `${this._duration.days()}D ` : ``;
+    const durationInDays = this._duration.asDays() >= 1 ? `${parseInt(this._duration.asDays(), 10)}D ` : ``;
     const durationInHours = this._duration.hours() ? `${this._duration.hours()}H ` : ``;
     const durationInMinutes = this._duration.minutes() ? `${this._duration.minutes()}M` : ``;
     return `${durationInDays}${durationInHours}${durationInMinutes}`;
@@ -76,7 +76,35 @@ class TripPoint extends Component {
   }
 
   _onClickOffer(evt) {
+    evt.preventDefault();
+    // const promise = new Promise((resolve, reject) => {
+    //   let targetOffer = evt.target.innerText;
+    //   targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + €`));
+
+    //   this._offers.forEach((offer) => {
+    //     if (offer.title === targetOffer) {
+    //       offer.accepted = true;
+    //     }
+    //   });
+
+    //   if (isFunction(this._onAddOffer)) {
+    //     this._onAddOffer();
+    //   }
+    // });
+
+    // promise
+    // .then(() => {
+    //   this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
+    //   evt.target.remove();
+    // })
+    // .catch(() => {
+    //   console.log('ошибка при выполнение _onAddOffer');
+    //   this.element.classList.add(`shake`);
+    // });
+
+
     // console.log(`Добавить оффер {${evt.target.innerText}} и обновить цену и отправить запрос на сервер`);
+    this._element.classList.toggle(`shake`, false);
 
     let targetOffer = evt.target.innerText;
     targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + €`));
@@ -89,11 +117,21 @@ class TripPoint extends Component {
 
 
     if (isFunction(this._onAddOffer)) {
-      this._onAddOffer();
+      // this._onAddOffer(evt.target);
+
+      this._onAddOffer(evt.target)
+        .then(() => {
+          this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
+          evt.target.remove();
+        })
+        .catch(() => {
+          console.log('ошибка при выполнение _onAddOffer');
+          this.element.classList.add(`shake`);
+        });
     }
 
-    this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
-    evt.target.remove();
+    // this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
+    // evt.target.remove();
   }
 
   bind() {
@@ -105,6 +143,10 @@ class TripPoint extends Component {
 
   unbind() {
     this._element.removeEventListener(`click`, this._onTripPointClick);
+  }
+
+  updateTotalPrice() {
+    this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
   }
 
   update(newData) {
