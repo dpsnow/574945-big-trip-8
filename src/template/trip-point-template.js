@@ -1,4 +1,4 @@
-import {typeTripPoint, Offers} from '../trip-points/trip-point-constants.js';
+import {typeTripPoint} from '../trip-points/trip-point-constants.js';
 
 // ограничить только до 3-х штук
 const getCheckedOffer = (offers) => {

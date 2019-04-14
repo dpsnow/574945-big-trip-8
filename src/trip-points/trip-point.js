@@ -1,4 +1,3 @@
-﻿// import moment from 'moment';
 import {isFunction, formatDate} from '../utils.js';
 import {Component} from '../component.js';
 import {getTemplate} from '../template/trip-point-template.js';
@@ -20,10 +19,6 @@ class TripPoint extends Component {
 
     this._icon = data.icon;
     this._duration = data.duration;
-
-    // this._day = data.day;
-    // this._times = data.times;
-
 
     this._onTripPointClick = this._onTripPointClick.bind(this);
     this._onClickOffer = this._onClickOffer.bind(this);
@@ -81,7 +76,7 @@ class TripPoint extends Component {
   }
 
   _onClickOffer(evt) {
-    console.log(`Добавить оффер {${evt.target.innerText}} и обновить цену и отправить запрос на сервер`);
+    // console.log(`Добавить оффер {${evt.target.innerText}} и обновить цену и отправить запрос на сервер`);
 
     let targetOffer = evt.target.innerText;
     targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + €`));

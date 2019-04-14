@@ -1,110 +1,64 @@
-import Chart from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {HorizontalChart} from './horizontal-chart.js';
+import {typeTripPoint} from '../trip-points/trip-point-constants.js';
 
-import moment from 'moment';
+const moneyCtx = document.querySelector(`.statistic__money`);
+const transportCtx = document.querySelector(`.statistic__transport`);
+const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
 
-// const moneyCtx = document.querySelector(`.statistic__money`);
-// const transportCtx = document.querySelector(`.statistic__transport`);
-// const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
+const tableContainer = document.getElementById(`table`);
+const statsContainer = document.getElementById(`stats`);
 
-// Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
-// const BAR_HEIGHT = 55;
+const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
+const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
-export class HorizontalChart {
-  constructor(container, title, data, prefix) {
-    // console.log('HorizontalChart', data);
-    this._container = container;
-    this._chart = new Chart(container, {
-      plugins: [ChartDataLabels],
-      type: `horizontalBar`,
-      data: {
-        // labels: [`✈️ FLY`, `🏨 STAY`, `🚗 DRIVE`, `🏛️ LOOK`, `🏨 EAT`, `🚕 RIDE`],
-        labels: data.labels,
-        datasets: [{
-          // data: [400, 300, 200, 160, 150, 100],
-          data: data.values,
-          backgroundColor: `#ffffff`,
-          hoverBackgroundColor: `#ffffff`,
-          anchor: `start`
-        }]
-      },
-      options: {
-        plugins: {
-          datalabels: {
-            font: {
-              size: 13
-            },
-            color: `#000000`,
-            anchor: `end`,
-            align: `start`,
-            // formatter: (val) => `${prefix}${val}`
-            formatter: (value) => {
-              if (prefix === `time`) {
-                // console.log(`${value}`);
-                return `${parseInt(moment.duration(value).asHours(), 10)}H`;
-              }
-              return `${prefix}${value}`;
-            }
-          }
-        },
-        title: {
-          display: true,
-          text: title || ``,
-          fontColor: `#000000`,
-          fontSize: 23,
-          position: `left`
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              fontColor: `#000000`,
-              padding: 5,
-              fontSize: 13,
-            },
-            gridLines: {
-              display: false,
-              drawBorder: false
-            },
-            barThickness: 44,
-          }],
-          xAxes: [{
-            ticks: {
-              display: false,
-              beginAtZero: true,
-            },
-            gridLines: {
-              display: false,
-              drawBorder: false
-            },
-            minBarLength: 60
-          }],
-        },
-        legend: {
-          display: false
-        },
-        tooltips: {
-          enabled: false,
-        },
+let moneyStats;
+let transportStats;
+let timeSpendStats;
+
+
+const getDataForStats = (allData, value = `count`) => {
+  // console.log(allData);
+  const variableForConvert = {};
+
+  allData.forEach((it) => {
+    if (it.isVisible) {
+      if (value === `duration`) {
+        variableForConvert[it.type] = (variableForConvert[it.type] || 0) + it[value].asMilliseconds();
+      } else {
+        variableForConvert[it.type] = (variableForConvert[it.type] || 0) + (value === `count` ? 1 : it[value]);
       }
-    });
-  }
+    }
+  });
 
-  get chart() {
-    return this._chart;
-  }
 
-  update(newData) {
-    // console.log('обновление данных для статы', newData);
-    // console.log('this.chart', this.chart);
-    // console.log(`BAR_HEIGHT=${BAR_HEIGHT} * newData.labels.length=${newData.labels.length} = ${BAR_HEIGHT * newData.labels.length}`);
-    this.chart.data.labels = newData.labels;
-    this.chart.data.datasets[0].data = newData.values;
-    // this._container.height = BAR_HEIGHT * newData.labels.length;
-    this.chart.update({
-      duration: 800,
-      easing: `easeOutQuart`
-    });
-  }
+  return {
+    labels: Object.keys(variableForConvert).map((el) => `${typeTripPoint[el].icon} ${el.toUpperCase()}`),
+    values: Object.values(variableForConvert)
+  };
+};
 
-}
+export const toggleVisibilityStatistics = (value) => {
+  // viewStatistics = value;
+  linkViewStatistics.classList.toggle(`view-switch__item--active`, value);
+  statsContainer.classList.toggle(`visually-hidden`, !value);
+
+  linkViewTable.classList.toggle(`view-switch__item--active`, !value);
+  tableContainer.classList.toggle(`visually-hidden`, value);
+  return value;
+};
+
+export const initStats = () => {
+  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `€ `);
+  transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, [], ``);
+  timeSpendStats = new HorizontalChart(timeSpendCtx, `TIME SPEND`, [], `time`);
+};
+
+export const updateStats = (allData) => {
+  moneyStats.update(getDataForStats(allData, `price`));
+  transportStats.update(getDataForStats(allData));
+  timeSpendStats.update(getDataForStats(allData, `duration`));
+
+  // moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, getDataForStats(allData, `price`), `€ `);
+  // transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);
+};
 

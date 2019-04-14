@@ -4,8 +4,8 @@ import moment from 'moment';
 import {isFunction, createElement, renderElements} from '../utils.js';
 
 import {Component} from '../component.js';
-import {getTemplate, renderAllOffers} from '../template/trip-point-edit-template.js';
-import {TripPointEntity} from './trip-point-entity.js';
+import {getTemplate} from '../template/trip-point-edit-template.js';
+
 import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -95,7 +95,7 @@ class TripPointEdit extends Component {
     for (const pair of formData.entries()) {
       const [property, value] = pair;
       // console.log('[property, value] = ', pair);
-      console.log(`newDate[_${property}_] = ${value}`);
+      // console.log(`newDate[_${property}_] = ${value}`);
 
       if (property === `offer`) {
         this._offers.forEach((offer) => {
@@ -118,8 +118,7 @@ class TripPointEdit extends Component {
       }
 
     }
-    console.log('convertedData', convertedData);
-    // return new TripPointEntity(convertedData);
+    // console.log('convertedData', convertedData);
     return {
       'base_price': convertedData[`price`],
       'date_from': moment(convertedData[`date-start`], `X`).valueOf(),
@@ -139,7 +138,6 @@ class TripPointEdit extends Component {
 
   _onResetBtnClick(evt) {
     evt.preventDefault();
-    console.log('_onResetBtnClick');
 
     this._element.querySelector(`button[type=reset]`).disabled = true;
     this._element.querySelector(`button[type=submit]`).disabled = true;
@@ -159,7 +157,7 @@ class TripPointEdit extends Component {
     const newOffer = document.createElement(`div`);
     newOffer.classList.add(`point__offers-wrap`);
     this._offers = typeTripPoint[this._type].offers;
-    console.log(this._offers);
+    // console.log(this._offers);
     if (!this._offers || this._offers.length === 0) {
       newOffer.textContent = `No avaliable offers`;
 

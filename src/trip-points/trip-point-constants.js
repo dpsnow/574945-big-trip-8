@@ -80,28 +80,4 @@ api.getDestinations()
 // .then(() => console.log('Destinations', Destinations));
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export {AUTHORIZATION, END_POINT, typeTripPoint, Offers, Destinations};

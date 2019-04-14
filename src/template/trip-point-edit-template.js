@@ -4,17 +4,6 @@ import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.j
 export const renderAllOffers = (point) => {
   // const currentArrayOffers = point._offers || typeTripPoint[point._type].offers;
   return point._offers.map((offer, index) => {
-  // return typeTripPoint[point._type].offers.map((offer) => {
-    // for (let addedOffer of point._offers.values()) {
-
-    //   console.log('addedOffer', addedOffer);
-    //   console.log('offer', offer);
-
-    //   if (addedOffer.title === offer.name) {
-    //     offer = addedOffer;
-    //   }
-    // }
-
     return `
     <input class="point__offers-input visually-hidden" type="checkbox" id="${point._id}-${index}" name="offer" value="${offer.title}"
     ${offer.accepted ? `checked` : ``}>
@@ -26,7 +15,7 @@ export const renderAllOffers = (point) => {
 };
 
 export const getTemplate = (point) => {
-  console.log('from TripPointEdit', point);
+  // console.log('from TripPointEdit', point);
   // console.log('Destinations', Destinations);
   return `
   <article class="point">
