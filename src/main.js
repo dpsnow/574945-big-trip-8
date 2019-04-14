@@ -1,16 +1,17 @@
-import {filtersData} from './data.js';
-import {Filter} from './filters/filter.js';
-
 import {API} from './api.js';
 import {renderElements, formatDate} from './utils.js';
 import {updateGeneralInfo} from './utils/update-general-info.js';
 
 import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
+import {renderFilters} from './filters/render-filters.js';
+
 import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
 import {TripPointEntity} from './trip-points/trip-point-entity.js';
 import {TripPoint} from './trip-points/trip-point.js';
 import {TripPointEdit} from './trip-points/trip-point-edit.js';
+
+import {TaskModel} from './task-model.js';
 
 const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
 const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
@@ -53,25 +54,6 @@ const filterTripPoint = (tripPoints, filterValue) => {
       });
   }
 };
-
-
-const renderFilters = (dataFilters) => {
-  const filterElements = [];
-
-  dataFilters.forEach((data) => {
-    const filter = new Filter(data);
-    filter.render();
-    filterElements.push(filter.element);
-    filter.onFilter = () => {
-      // console.log(`onFilter`, evt);
-      // не понятно что должна выполнять функция, обработчик фильтра на строке 108
-    };
-  });
-
-  // console.log(filterElements);
-  renderElements(filtersContainer, filterElements);
-};
-
 
 const renderTripPoints = (entitiesTripPoints) => {
   // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
@@ -207,14 +189,6 @@ const renderTripPoints = (entitiesTripPoints) => {
 };
 
 
-// не факт что нужгл
-// const sortByDay = (array) => {
-//   array.sort((a, b) => {
-//     console.log(a.timeStart, b.timeStart);
-//     return a.timeStart - b.timeStart;
-//   });
-// };
-
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const init = () => {
@@ -227,32 +201,41 @@ const init = () => {
   .then((data) => {
     // console.log('getPoints', data);
     const tripPointsEntities = data.map((it) => new TripPointEntity(it));
-    // console.log('tripPointsEntities', tripPointsEntities);
+    const tripPointsEntities0 = new TaskModel(data.map((it) => new TripPointEntity(it)));
 
+    // console.log('tripPointsEntities', tripPointsEntities);
+    console.log('tripPointsEntities0', tripPointsEntities0);
 
     tripPointsContainer.innerHTML = ``;
     renderTripPoints(tripPointsEntities);
 
     updateGeneralInfo(tripPointsEntities, `all`);
 
-    renderFilters(filtersData);
+    // renderFilters(filtersData);
+    renderFilters(filtersContainer);
 
     initStats();
 
     // сортировка
-    document.querySelector(`.trip-sorting`).addEventListener(`change`, () => {
+    document.querySelector(`.trip-sorting`).addEventListener(`change`, (evt) => {
       // console.log('Сортировка по ', evt.target.value);
+      tripPointsContainer.innerHTML = ``;
+      tripPointsEntities0.sort(evt.target.value);
+      renderTripPoints(tripPointsEntities0.data);
     });
 
     // фильтрация по времени
     filtersContainer.addEventListener(`change`, (evt) => {
       tripPointsContainer.innerHTML = ``;
-      filterTripPoint(tripPointsEntities, evt.target.value);
+
+      tripPointsEntities0.filter(evt.target.value);
+      // filterTripPoint(tripPointsEntities, evt.target.value);
 
       if (viewStatistics) {
         updateStats(tripPointsEntities);
       } else {
-        renderTripPoints(tripPointsEntities);
+        // renderTripPoints(tripPointsEntities);
+        renderTripPoints(tripPointsEntities0.data);
       }
     });
 
