@@ -4,7 +4,7 @@ import {typeTripPoint, Destinations} from './trip-point-constants.js';
 
 class TripPointEntity {
   constructor(data) {
-    console.log(`in TripPointEntity`, data);
+    // console.log(`in TripPointEntity`, data);
 
     // this.id = data.id || 25;
     // this.day = data.day || Number(formatDate([], `x`), 10);
@@ -32,17 +32,17 @@ class TripPointEntity {
 
     // data[`total-price`];
 
-    if (data.offer) {
-      this.addedOffers = [].concat(data.offer).map((offer) => {
-        const [title, price] = offer.split(`; price:`);
-        console.log(title, price);
-        return {
-          title,
-          price,
-          accepted: true
-        };
-      });
-    }
+    // if (data.offer) {
+    //   this.addedOffers = [].concat(data.offer).map((offer) => {
+    //     const [title, price] = offer.split(`; price:`);
+    //     console.log(title, price);
+    //     return {
+    //       title,
+    //       price,
+    //       accepted: true
+    //     };
+    //   });
+    // }
 
   }
 

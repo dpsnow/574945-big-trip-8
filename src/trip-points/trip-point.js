@@ -2,6 +2,7 @@
 import {isFunction, formatDate} from '../utils.js';
 import {Component} from '../component.js';
 import {getTemplate} from '../template/trip-point-template.js';
+import {Destinations} from '../trip-points/trip-point-constants.js';
 
 class TripPoint extends Component {
   constructor(data) {
@@ -47,6 +48,29 @@ class TripPoint extends Component {
     this._onEdit = fn;
   }
 
+  set onAddOffer(fn) {
+    this._onAddOffer = fn;
+  }
+
+
+  get toRaw() {
+    return {
+      'base_price': this._price,
+      'date_from': this._timeStart,
+      'date_to': this._timeEnd,
+      'destination': {
+        name: this._destination,
+        description: Destinations[this._destination].description,
+        pictures: Destinations[this._destination].pictures
+      },
+      'id': this._id,
+      'is_favorite': this._isFavorite,
+      'offers': this._offers,
+      'type': this._type
+    };
+  }
+
+
   _onTripPointClick(evt) {
     if (evt.target.classList.contains(`trip-point__offer`)) {
       return;
@@ -58,6 +82,23 @@ class TripPoint extends Component {
 
   _onClickOffer(evt) {
     console.log(`Добавить оффер {${evt.target.innerText}} и обновить цену и отправить запрос на сервер`);
+
+    let targetOffer = evt.target.innerText;
+    targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + €`));
+
+    this._offers.forEach((offer) => {
+      if (offer.title === targetOffer) {
+        offer.accepted = true;
+      }
+    });
+
+
+    if (isFunction(this._onAddOffer)) {
+      this._onAddOffer();
+    }
+
+    this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
+    evt.target.remove();
   }
 
   bind() {

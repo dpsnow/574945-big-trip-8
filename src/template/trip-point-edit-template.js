@@ -2,10 +2,10 @@ import {formatDate} from '../utils.js';
 import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.js';
 
 export const renderAllOffers = (point) => {
-  // const currentArrayOffers = point._addedOffers || typeTripPoint[point._type].offers;
-  return point._addedOffers.map((offer, index) => {
+  // const currentArrayOffers = point._offers || typeTripPoint[point._type].offers;
+  return point._offers.map((offer, index) => {
   // return typeTripPoint[point._type].offers.map((offer) => {
-    // for (let addedOffer of point._addedOffers.values()) {
+    // for (let addedOffer of point._offers.values()) {
 
     //   console.log('addedOffer', addedOffer);
     //   console.log('offer', offer);
@@ -16,7 +16,7 @@ export const renderAllOffers = (point) => {
     // }
 
     return `
-    <input class="point__offers-input visually-hidden" type="checkbox" id="${point._id}-${index}" name="offer" value="${offer.title}; price:${offer.price}"
+    <input class="point__offers-input visually-hidden" type="checkbox" id="${point._id}-${index}" name="offer" value="${offer.title}"
     ${offer.accepted ? `checked` : ``}>
     <label for="${point._id}-${index}" class="point__offers-label">
       <span class="point__offer-service">${offer.title || offer.name}</span> + €<span class="point__offer-price">${offer.price}</span>
@@ -54,8 +54,6 @@ export const getTemplate = (point) => {
         <label class="point__destination-label" for="destination">${typeTripPoint[point._type].text}</label>
         <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination.name}" name="destination">
         <datalist id="destination-select">
-          <option value="airport"></option>
-          <option value="hotel"></option>
           ${Object.keys(Destinations).map((city) => `<option value="${city}"></option>`).join(``)}
         </datalist>
       </div>
@@ -92,13 +90,13 @@ export const getTemplate = (point) => {
       <section class="point__offers">
         <h3 class="point__details-title">offers</h3>
 
-        <div class="point__offers-wrap">${renderAllOffers(point)}
+        <div class="point__offers-wrap">${point._offers ? renderAllOffers(point) : `No avaliable offers`}
         </div>
 
       </section>
       <section class="point__destination">
         <h3 class="point__details-title">Destination</h3>
-        <p class="point__destination-text">${point._destination.description}</p>
+        <p class="point__destination-text">${point._destination.description || `No descrition for this destination`}</p>
         <div class="point__destination-images">
          ${point._destination.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``)}
         </div>

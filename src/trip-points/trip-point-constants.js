@@ -1,6 +1,6 @@
 import {API} from '../api.js';
 
-const AUTHORIZATION = `Basic dXNtgffk5BwYXNz589gZAo=0`;
+const AUTHORIZATION = `Basic dXwYXgthgjhkNz589gZAo=0`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
@@ -44,26 +44,33 @@ let typeTripPoint = {
     icon: `🏨`,
     text: `Check-in`,
   },
-  // 'restaurant': {
-  //   icon: `🍴`,
-  //   text: `Restaurant in`,
-  // },
+  'restaurant': {
+    icon: `🍴`,
+    text: `Restaurant in`,
+  },
 };
 
 
 api.getOffers()
 .then((inputOffers) => {
-  console.log(inputOffers);
   inputOffers.forEach((it) => {
-    typeTripPoint[it.type].offers = it.offers;
+    typeTripPoint[it.type].offers = [];
+    it.offers.forEach((offer) => {
+      typeTripPoint[it.type].offers.push({
+        title: offer.name,
+        price: offer.price,
+        accepted: false
+      });
+    });
+
   });
-})
-.then(() => console.log('typeTripPoint', typeTripPoint));
+});
+// .then(() => console.log('typeTripPoint', typeTripPoint));
 
 
 api.getDestinations()
 .then((inputDestinations) => {
-  console.log('inputDestinations', inputDestinations);
+  // console.log('inputDestinations', inputDestinations);
   inputDestinations.forEach((it) => {
     Destinations[it.name] = {};
     Destinations[it.name].description = it.description;
