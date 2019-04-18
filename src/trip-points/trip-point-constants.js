@@ -1,6 +1,6 @@
 import {API} from '../api.js';
 
-const AUTHORIZATION = `Basic dXgthgYHGjjjgZAo=0`;
+const AUTHORIZATION = `Basic dXgtyhYsdfHGrjgZAo=0`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 

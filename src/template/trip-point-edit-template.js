@@ -41,7 +41,7 @@ export const getTemplate = (point) => {
 
       <div class="point__destination-wrap">
         <label class="point__destination-label" for="destination">${typeTripPoint[point._type].text}</label>
-        <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination.name}" name="destination">
+        <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination.name}" name="destination" required >
         <datalist id="destination-select">
           ${Object.keys(Destinations).map((city) => `<option value="${city}"></option>`).join(``)}
         </datalist>
@@ -49,8 +49,8 @@ export const getTemplate = (point) => {
 
       <div class="point__time">
         choose time
-        <input class="point__input" type="text" value="${formatDate(point._timeStart, `X`)}" name="date-start" placeholder="19:00">
-        <input class="point__input" type="text" value="${formatDate(point._timeEnd, `X`)}" name="date-end" placeholder="21:00">
+        <input class="point__input" type="text" value="${formatDate(point._timeStart, `X`)}" name="date-start" placeholder="19:00" required>
+        <input class="point__input" type="text" value="${formatDate(point._timeEnd, `X`)}" name="date-end" placeholder="21:00" required>
       </div>
 
       <label class="point__price">

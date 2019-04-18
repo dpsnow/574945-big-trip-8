@@ -63,9 +63,16 @@ class TripPointEdit extends Component {
     this._onCancelEditMode = fn;
   }
 
+  closeEditPoint() {
+    if (isFunction(this._onCancelEditMode)) {
+      this._onCancelEditMode();
+    }
+  }
+
   _onESCkeydown(evt) {
     const ESC_KEYCODE = 27;
     if (evt.keyCode === ESC_KEYCODE && isFunction(this._onCancelEditMode)) {
+    // if (evt.keyCode === ESC_KEYCODE) {
       this._onCancelEditMode();
     }
   }
@@ -123,9 +130,10 @@ class TripPointEdit extends Component {
 
   _onSubmitBtnClick(evt) {
     evt.preventDefault();
-
+// this.validateForm();
     const newDate = new FormData(evt.target);
     const updateDate = this._convertDate(newDate);
+    console.log(updateDate);
 
     this._element.classList.toggle(`shake`, false);
     this._element.querySelector(`button[type=reset]`).disabled = true;
@@ -152,20 +160,23 @@ class TripPointEdit extends Component {
     this._element.querySelector(`button[type=submit]`).disabled = true;
     this._element.querySelector(`button[type=reset]`).textContent = `Deleting...`;
 
-    if (this._isNewTripPoint) {
-      this.unrender();
-    } else if (isFunction(this._onDelete)) {
-      this._onDelete()
-      .then(() => {
+    if (isFunction(this._onDelete)) {
+      if (this._isNewTripPoint) {
         this.unrender();
-      })
-      .catch((error) => {
-        console.error(error);
-        this._element.classList.toggle(`shake`, true);
-        this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
-        this._element.querySelector(`button[type=submit]`).disabled = false;
-        this._element.querySelector(`button[type=reset]`).disabled = false;
-      });
+        this._onDelete();
+      } else {
+        this._onDelete()
+        .then(() => {
+          this.unrender();
+        })
+        .catch((error) => {
+          console.error(error);
+          this._element.classList.toggle(`shake`, true);
+          this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
+          this._element.querySelector(`button[type=submit]`).disabled = false;
+          this._element.querySelector(`button[type=reset]`).disabled = false;
+        });
+      }
     }
   }
 
@@ -224,6 +235,7 @@ class TripPointEdit extends Component {
     this._flatpickrFrom = flatpickr(inputTimeFrom, {
       enableTime: true,
       altFormat: `H:i`,
+      allowInput: true,
       [`time_24hr`]: true,
       altInput: true,
       dateFormat: `U`
@@ -232,6 +244,7 @@ class TripPointEdit extends Component {
     this._flatpickrTo = flatpickr(inputTimeTo, {
       minDate: moment(this._timeStart, `x`).format(`YYYY-MM-DD`),
       enableTime: true,
+      allowInput: true,
       altFormat: `H:i`,
       [`time_24hr`]: true,
       altInput: true,
@@ -240,6 +253,10 @@ class TripPointEdit extends Component {
 
     inputTimeFrom.addEventListener(`change`, (evt) => {
       this._flatpickrTo.config.minDate = evt.target.value;
+
+      if (inputTimeTo.value < evt.target.value) {
+        this._flatpickrTo.setDate(evt.target.value);
+      }
     });
 
     if (this._isNewTripPoint) {
@@ -258,6 +275,7 @@ class TripPointEdit extends Component {
 
       inputTimeFrom.addEventListener(`change`, (evt) => {
         this._flatpickrDay.setDate(evt.target.value);
+        this._flatpickrTo.setDate(evt.target.value);
       });
     }
   }

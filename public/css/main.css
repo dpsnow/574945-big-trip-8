@@ -689,3 +689,8 @@ input[type=radio]:checked + .trip-sorting__item {
   margin-right: 30px;
   margin-bottom: 20px;
 }
+
+button.trip-controls__new-event:disabled {
+  opacity: 0.8;
+  cursor: default;
+}

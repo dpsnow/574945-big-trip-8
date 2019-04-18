@@ -1,5 +1,6 @@
 import {API} from './api.js';
 import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
+import moment from 'moment';
 
 // import {formatDate} from './utils.js';
 
@@ -13,6 +14,8 @@ class TripModel {
   }
 
   get data() {
+    this.filter(this._currentFilter);
+    this.sort(this._currentSort);
     return this._data;
   }
 
@@ -50,22 +53,22 @@ class TripModel {
     switch (value) {
       case `Future`:
         return this._data.forEach((point) => {
-          // point.isVisible = Boolean(point.timeStart > Date.now());
           if (point === null) {
             return;
           }
 
-          point.isVisible = point.price >= 1000;
+          point.isVisible = Boolean(point.timeStart > Date.now());
+          // point.isVisible = point.price >= 1000;
         });
 
       case `Past`:
         return this._data.forEach((point) => {
-          // point.isVisible = Boolean(point.timeEnd < Date.now());
           if (point === null) {
             return;
           }
 
-          point.isVisible = point.price < 1000;
+          point.isVisible = Boolean(point.timeEnd < Date.now());
+          // point.isVisible = point.price < 1000;
         });
 
       default:
@@ -108,6 +111,7 @@ class TripModel {
       }, 0),
       finishDate: correctData[correctData.length - 1].timeEnd,
       startDate: correctData[0].timeStart,
+      startDate: moment(correctData[0].timeStart).startOf(`date`).valueOf(),
       lastId: correctData[correctData.length - 1].id
     };
   }

@@ -36,10 +36,15 @@ class TripPointEntity {
   }
 
   getDay(startDate) {
+    const startDay = moment(startDate);
+    const currentDay = moment(this.timeStart);
     // console.log(`-----------------------------`);
     // console.log(`this.timeStart = ${moment(this.timeStart).date()}; startDate = ${moment(startDate).date()};`);
+    console.log(currentDay.diff(startDay, `days`));
     // return moment(this.timeStart).diff(startDate, `days`);
-    return moment(this.timeStart).date() - moment(startDate).date() + 1;
+
+    // return moment(this.timeStart).date() - moment(startDate).date() + 1;
+    return currentDay.diff(startDay, `days`) + 1;
   }
 
   get isVisible() {

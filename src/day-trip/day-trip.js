@@ -3,7 +3,7 @@ import {getTemplate} from './day-trip-template.js';
 
 class DayTrip extends Component {
   constructor(day, date) {
-  console.log(day, date);
+  // console.log(day, date);
     // elementsTripPoints
     super();
     this.day = day;
@@ -14,9 +14,9 @@ class DayTrip extends Component {
     return getTemplate(this);
   }
 
-  addPointElement(element) {
-    this._element.querySelector(`.trip-day__items`).appendChild(element);
-  }
+  // addPointElement(element) {
+  //   this._element.querySelector(`.trip-day__items`).appendChild(element);
+  // }
 
   get containerForPoints() {
     return this._element.querySelector(`.trip-day__items`);
