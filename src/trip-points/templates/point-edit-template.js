@@ -1,5 +1,5 @@
-import {formatDate} from '../utils.js';
-import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.js';
+import {formatDate} from '../../utils/utils.js';
+import {typeTripPoint, Destinations} from '../trip-point-constants.js';
 
 export const renderAllOffers = (point) => {
   // const currentArrayOffers = point._offers || typeTripPoint[point._type].offers;

@@ -1,20 +1,19 @@
 import {API} from './api.js';
-import {renderElements, formatDate} from './utils.js';
+import {renderElements, formatDate} from './utils/utils.js';
 import {updateGeneralInfo} from './utils/update-general-info.js';
-
-import moment from 'moment';
 
 import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
-import {renderFilters} from './filters/render-filters.js';
+import {renderFilters} from './utils/render-filters.js';
+
+import {DayTrip} from "./day-trip/day-trip.js";
 
 import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
-import {TripPointEntity} from './trip-points/trip-point-entity.js';
-import {TripPoint} from './trip-points/trip-point.js';
-import {TripPointEdit} from './trip-points/trip-point-edit.js';
+import {TripPointEntity} from './trip-point-entity.js';
+import {Point} from './trip-points/point.js';
+import {PointEdit} from './trip-points/point-edit.js';
 
 import {TripModel} from "./trip-model";
-import {DayTrip} from "./day-trip/day-trip.js";
 
 const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
 const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
@@ -27,22 +26,17 @@ const btnNewEvent = document.querySelector(`.trip-controls__new-event`);
 let viewStatistics = false;
 let edtingMode = null;
 
-let daysTrip = [];
-
+let allDaysTrip = [];
 
 const renderTripPoints = (entitiesTripPoints) => {
+  let oneDayTrip;
+  allDaysTrip = [];
   tripPointsContainer.innerHTML = ``;
-  daysTrip = [];
+  let dayTrip;
 
   // entitiesTripPoints.sort(stateSort);
 
-  console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
-
-  let dayTrip;
-
-  let allDaysTrip = [];
-  let oneDayTripPoint;
-
+  // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
 
   entitiesTripPoints.data.forEach((pointEntity, i) => {
     // console.log('pointEntity', pointEntity);
@@ -56,28 +50,23 @@ const renderTripPoints = (entitiesTripPoints) => {
     let currentDate = pointEntity.date;
     let oneDayItems;
 
-    console.log('currentDay', currentDay);
-    console.log('currentDate', currentDate);
-
-
-
     if (dayTrip !== currentDay) {
-      oneDayTripPoint = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
+      oneDayTrip = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
       // oneDayTripPoint = new DayTrip(currentDay, moment(currentDate).format('DD MMM'));
-      oneDayTripPoint.render();
+      oneDayTrip.render();
       dayTrip = currentDay;
     }
 
-    console.log('oneDayTripPoint', oneDayTripPoint);
+    // console.log('oneDayTripPoint', oneDayTripPoint);
 
     if (pointEntity.isVisible) {
 
-      const tripPoint = new TripPoint(pointEntity);
-      const editTripPoint = new TripPointEdit(pointEntity);
+      const tripPoint = new Point(pointEntity);
+      const editTripPoint = new PointEdit(pointEntity);
 
-      daysTrip.push(oneDayTripPoint.element);
+      allDaysTrip.push(oneDayTrip.element);
 
-      oneDayItems = oneDayTripPoint.containerForPoints;
+      oneDayItems = oneDayTrip.containerForPoints;
 
 
       editTripPoint.onCancelEditMode = () => {
@@ -104,7 +93,9 @@ const renderTripPoints = (entitiesTripPoints) => {
               // oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
               // editTripPoint.unrender();
 
+
               // обновлять все точки вместо замены, из-за того что нужно обновлять контейнер дни путешествий
+              // console.log('entitiesTripPoints', entitiesTripPoints);
               renderTripPoints(entitiesTripPoints);
 
               updateGeneralInfo(entitiesTripPoints.generalInfo, `all`);
@@ -164,7 +155,7 @@ const renderTripPoints = (entitiesTripPoints) => {
 
   // console.log('daysTrip', daysTrip);
 
-  renderElements(tripPointsContainer, daysTrip);
+  renderElements(tripPointsContainer, allDaysTrip);
 };
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -181,7 +172,7 @@ api.getPoints()
     const tripPointsEntities = new TripModel(data.map((it) => new TripPointEntity(it)));
 
     // console.log('tripPointsEntities', tripPointsEntities);
-    console.log('tripPointsEntities', tripPointsEntities);
+    // console.log('tripPointsEntities', tripPointsEntities);
 
     tripPointsEntities.sort(`day`);
 
@@ -234,18 +225,18 @@ api.getPoints()
       btnNewEvent.disabled = true;
 
       const newPointEntity = new TripPointEntity(tripPointsEntities.dataForNewTripPoint);
-      const editTripPointNew = new TripPointEdit(newPointEntity);
+      const editTripPointNew = new PointEdit(newPointEntity);
       tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
 
       editTripPointNew.onSubmit = (newData) => {
         // console.log(newData);
         return tripPointsEntities.add(newData)
           .then((response) => {
-            console.log(response);
+            // console.log(response);
             const newTripPointNewEntity = new TripPointEntity(response);
             // const newTripPoint = new TripPoint(tripPointNewEntity);
-            console.log(newTripPointNewEntity);
-            console.log(tripPointsEntities);
+            // console.log(newTripPointNewEntity);
+            // console.log(tripPointsEntities);
             tripPointsEntities.data.push(newTripPointNewEntity);
 
             renderTripPoints(tripPointsEntities);
@@ -258,7 +249,7 @@ api.getPoints()
 
       editTripPointNew.onDelete = () => {
         // console.log(`onDelete [${i}]`, entitiesTripPoints.data[i]);
-        return btnNewEvent.disabled = false;
+        btnNewEvent.disabled = false;
       };
 
       // console.log(newPointEntity);
@@ -267,7 +258,7 @@ api.getPoints()
 
     });
   })
-  .catch((error) => {
+  .catch(() => {
     tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
-    console.error(error);
+    // console.error(error);
   });

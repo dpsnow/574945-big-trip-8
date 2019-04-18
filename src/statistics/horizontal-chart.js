@@ -10,7 +10,7 @@ import moment from 'moment';
 // Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
 // const BAR_HEIGHT = 55;
 
-export class HorizontalChart {
+class HorizontalChart {
   constructor(container, title, data, prefix) {
     // console.log('HorizontalChart', data);
     this._container = container;
@@ -18,10 +18,8 @@ export class HorizontalChart {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        // labels: [`✈️ FLY`, `🏨 STAY`, `🚗 DRIVE`, `🏛️ LOOK`, `🏨 EAT`, `🚕 RIDE`],
         labels: data.labels,
         datasets: [{
-          // data: [400, 300, 200, 160, 150, 100],
           data: data.values,
           backgroundColor: `#ffffff`,
           hoverBackgroundColor: `#ffffff`,
@@ -37,10 +35,8 @@ export class HorizontalChart {
             color: `#000000`,
             anchor: `end`,
             align: `start`,
-            // formatter: (val) => `${prefix}${val}`
             formatter: (value) => {
               if (prefix === `time`) {
-                // console.log(`${value}`);
                 return `${parseInt(moment.duration(value).asHours(), 10)}H`;
               }
               return `${prefix}${value}`;
@@ -108,3 +104,4 @@ export class HorizontalChart {
 
 }
 
+export {HorizontalChart};

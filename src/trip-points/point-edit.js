@@ -1,17 +1,17 @@
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 
-import {isFunction, createElement, renderElements} from '../utils.js';
+import {isFunction, createElement, renderElements} from '../utils/utils.js';
 
 import {Component} from '../component.js';
-import {getTemplate, renderAllOffers} from '../template/trip-point-edit-template.js';
+import {getTemplate} from './templates/point-edit-template.js';
 
-import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.js';
+import {ESC_KEYCODE, typeTripPoint, Destinations} from './trip-point-constants.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_green.css';
 
-class TripPointEdit extends Component {
+class PointEdit extends Component {
   constructor(data) {
     // console.log('from TripPointEdit', data);
     // console.log('typeTripPoint', typeTripPoint);
@@ -70,7 +70,6 @@ class TripPointEdit extends Component {
   }
 
   _onESCkeydown(evt) {
-    const ESC_KEYCODE = 27;
     if (evt.keyCode === ESC_KEYCODE && isFunction(this._onCancelEditMode)) {
     // if (evt.keyCode === ESC_KEYCODE) {
       this._onCancelEditMode();
@@ -130,10 +129,10 @@ class TripPointEdit extends Component {
 
   _onSubmitBtnClick(evt) {
     evt.preventDefault();
-// this.validateForm();
+    // this.validateForm();
     const newDate = new FormData(evt.target);
     const updateDate = this._convertDate(newDate);
-    console.log(updateDate);
+    // console.log(updateDate);
 
     this._element.classList.toggle(`shake`, false);
     this._element.querySelector(`button[type=reset]`).disabled = true;
@@ -142,8 +141,8 @@ class TripPointEdit extends Component {
 
     if (isFunction(this._onSubmit)) {
       this._onSubmit(updateDate)
-      .catch((error) => {
-        console.error(error);
+      .catch(() => {
+        // console.error(error);
         this._element.classList.toggle(`shake`, true);
         this._element.querySelector(`button[type=submit]`).textContent = `Save`;
         this._element.querySelector(`button[type=submit]`).disabled = false;
@@ -169,8 +168,8 @@ class TripPointEdit extends Component {
         .then(() => {
           this.unrender();
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(() => {
+          // console.error(error);
           this._element.classList.toggle(`shake`, true);
           this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
           this._element.querySelector(`button[type=submit]`).disabled = false;
@@ -326,4 +325,4 @@ class TripPointEdit extends Component {
 
 }
 
-export {TripPointEdit};
+export {PointEdit};

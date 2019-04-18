@@ -37,7 +37,7 @@ const getDataForStats = (allData, value = `count`) => {
   };
 };
 
-export const toggleVisibilityStatistics = (value) => {
+const toggleVisibilityStatistics = (value) => {
   // viewStatistics = value;
   linkViewStatistics.classList.toggle(`view-switch__item--active`, value);
   statsContainer.classList.toggle(`visually-hidden`, !value);
@@ -47,13 +47,13 @@ export const toggleVisibilityStatistics = (value) => {
   return value;
 };
 
-export const initStats = () => {
+const initStats = () => {
   moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `€ `);
   transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, [], ``);
   timeSpendStats = new HorizontalChart(timeSpendCtx, `TIME SPEND`, [], `time`);
 };
 
-export const updateStats = (allData) => {
+const updateStats = (allData) => {
   moneyStats.update(getDataForStats(allData, `price`));
   transportStats.update(getDataForStats(allData));
   timeSpendStats.update(getDataForStats(allData, `duration`));
@@ -62,3 +62,4 @@ export const updateStats = (allData) => {
   // transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);
 };
 
+export {toggleVisibilityStatistics, initStats, updateStats};

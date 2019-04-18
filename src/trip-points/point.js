@@ -1,9 +1,9 @@
-import {isFunction, formatDate} from '../utils.js';
+import {isFunction, formatDate} from '../utils/utils.js';
 import {Component} from '../component.js';
-import {getTemplate} from '../template/trip-point-template.js';
-import {Destinations} from '../trip-points/trip-point-constants.js';
+import {getTemplate} from './templates/point-template.js';
+import {Destinations} from './trip-point-constants.js';
 
-class TripPoint extends Component {
+class Point extends Component {
   constructor(data) {
     // console.log('in TripPoint', data);
     super();
@@ -124,9 +124,9 @@ class TripPoint extends Component {
           this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
           evt.target.remove();
         })
-        .catch((error) => {
-          console.error(error);
-          console.log('ошибка при выполнение _onAddOffer');
+        .catch(() => {
+          // console.error(error);
+          // console.log('ошибка при выполнение _onAddOffer');
           this.element.classList.add(`shake`);
         });
     }
@@ -166,4 +166,4 @@ class TripPoint extends Component {
   }
 }
 
-export {TripPoint};
+export {Point};

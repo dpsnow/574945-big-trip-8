@@ -4,6 +4,8 @@ const AUTHORIZATION = `Basic dXgtyhYsdfHGrjgZAo=0`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
+const ESC_KEYCODE = 27;
+
 let Offers = {};
 let Destinations = {};
 // let Destinations = new Map();
@@ -81,4 +83,4 @@ api.getDestinations()
 // .then(() => console.log('Destinations', Destinations));
 
 
-export {AUTHORIZATION, END_POINT, typeTripPoint, Offers, Destinations};
+export {AUTHORIZATION, END_POINT, ESC_KEYCODE, typeTripPoint, Offers, Destinations};

@@ -1,6 +1,6 @@
-import {renderElements} from '../utils.js';
+import {renderElements} from './utils.js';
 
-import {Filter} from './filter.js';
+import {Filter} from '../filters/filter.js';
 
 const filtersData = [
   {

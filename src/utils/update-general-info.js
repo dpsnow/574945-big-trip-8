@@ -1,4 +1,4 @@
-import {formatDate} from '../utils.js';
+import {formatDate} from './utils.js';
 
 const tripSchedule = document.querySelector(`.trip__points`);
 const tripTotalCost = document.querySelector(`.trip__total-cost`);
