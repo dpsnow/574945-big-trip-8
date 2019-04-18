@@ -11,11 +11,11 @@ class TripPointEntity {
     this.id = data.id;
     this.timeStart = Number(data[`date_from`]);
     this.timeEnd = Number(data[`date_to`]);
-    this.type = data.type;
-    this.destination = data.destination;
+    this.type = data.type || `taxi`;
+    this.destination = data.destination || {name: ``, description: ``, pictures: []};
     this.isFavorite = Boolean(data[`is_favorite`]);
     this.price = Number(data[`base_price`]);
-    this.offers = data[`offers`];
+    this.offers = data[`offers`] || typeTripPoint[data.type || `taxi`].offers;
   }
 
   get icon() {
@@ -31,8 +31,22 @@ class TripPointEntity {
     return summOffers + this.price;
   }
 
-  get day() {
+  get date() {
     return moment(this.timeStart).startOf(`date`).valueOf();
+  }
+
+  getDay(startDate) {
+    // console.log(startDate);
+    // console.log(this.timeStart);
+    // console.log(moment.duration(moment(this.timeStart).diff(startDate)));
+    // console.log(moment(startDate).date());
+    // console.log(moment(this.timeStart).date());
+    // console.log(moment(this.timeStart).diff(startDate, 'days'));
+
+
+    // return moment(this.timeStart).date() - moment(this.timeStart).date();
+    return moment(this.timeStart).diff(startDate, `days`) + 1;
+    // return moment.duration(moment(startDate, `x`).diff(moment(this.timeStart, `x`))).asDays();
   }
 
   get isVisible() {

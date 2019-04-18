@@ -15,15 +15,15 @@ export const renderAllOffers = (point) => {
 };
 
 export const getTemplate = (point) => {
-  // console.log('from TripPointEdit', point);
-  // console.log('Destinations', Destinations);
+  console.log('from TripPointEdit', point);
+  console.log('Destinations', Destinations);
   return `
   <article class="point">
   <form action="" method="get">
     <header class="point__header">
       <label class="point__date">
         choose day
-        <input class="point__input" type="text" placeholder="MAR 18" name="day">
+        <input class="point__input" type="text" placeholder="MAR 18" name="day" value="${formatDate(point._timeStart, `X`)}">
       </label>
 
       <div class="travel-way">
@@ -46,11 +46,6 @@ export const getTemplate = (point) => {
           ${Object.keys(Destinations).map((city) => `<option value="${city}"></option>`).join(``)}
         </datalist>
       </div>
-
-      <!--<label class="point__time">
-        choose time
-        <input class="point__input" type="text" value="${formatDate(point._timeStart, `X`)} — ${formatDate(point._timeEnd, `X`)}" name="time" placeholder="00:00&nbsp;&mdash;&nbsp;00:00">
-      </label>-->
 
       <div class="point__time">
         choose time
@@ -86,7 +81,8 @@ export const getTemplate = (point) => {
       <section class="point__destination">
         <h3 class="point__details-title">Destination</h3>
         <p class="point__destination-text">${point._destination.description || `No descrition for this destination`}</p>
-        <div class="point__destination-images">
+
+        <div class="point__destination-images"${point._destination.pictures.length ? `` : ` style="display:none"`}>
          ${point._destination.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``)}
         </div>
       </section>

@@ -11,7 +11,8 @@ import {TripPointEntity} from './trip-points/trip-point-entity.js';
 import {TripPoint} from './trip-points/trip-point.js';
 import {TripPointEdit} from './trip-points/trip-point-edit.js';
 
-import {TaskModel} from './task-model.js';
+import {TripModel} from "./trip-model";
+import {DayTrip} from "./day-trip/day-trip.js";
 
 const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
 const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
@@ -27,11 +28,10 @@ const renderTripPoints = (entitiesTripPoints) => {
   console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
   tripPointsContainer.innerHTML = ``;
 
-  const tripPoitsElements = [];
-  let count = 0;
-  let currentDay;
+  const DaysTrip = [];
+  let dayTrip;
   // let isEditMode;
-  let oneDayTripPointContainer;
+  let oneDayTripPoint;
 
   entitiesTripPoints.data.forEach((pointEntity, i) => {
     // console.log('pointEntity', pointEntity);
@@ -41,21 +41,25 @@ const renderTripPoints = (entitiesTripPoints) => {
       return;
     }
 
-    if (currentDay !== pointEntity.day) {
-      oneDayTripPointContainer = oneDayTripPointsTemplate.cloneNode(true);
-      currentDay = pointEntity.day;
-      oneDayTripPointContainer.querySelector(`.trip-day__title`).textContent = formatDate(currentDay, `DD MMM`);
+    let currentDay = pointEntity.getDay(entitiesTripPoints.generalInfo.startDate);
+    let currentDate = pointEntity.date;
 
-      ++count;
-      oneDayTripPointContainer.querySelector(`.trip-day__number`).textContent = count;
+    if (dayTrip !== currentDay) {
+      oneDayTripPoint = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
+      oneDayTripPoint.render();
 
+      dayTrip = currentDay;
 
+      // oneDayTripPoint.element.querySelector(`.trip-day__title`).textContent = formatDate(currentDate, `DD MMM`);
+      // oneDayTripPoint.element.querySelector(`.trip-day__number`).textContent = count;
     }
+
 
     if (pointEntity.isVisible) {
 
       const tripPoint = new TripPoint(pointEntity);
       const editTripPoint = new TripPointEdit(pointEntity);
+
 
       tripPoint.onEdit = () => {
         // if (isEditMode) {
@@ -118,16 +122,19 @@ const renderTripPoints = (entitiesTripPoints) => {
 
       };
 
-      tripPoitsElements.push(oneDayTripPointContainer);
-      const oneDayItems = oneDayTripPointContainer.querySelector(`.trip-day__items`);
+
+      DaysTrip.push(oneDayTripPoint.element);
+
+      const oneDayItems = oneDayTripPoint.containerForPoints;
+      console.log(oneDayTripPoint);
       oneDayItems.appendChild(tripPoint.render());
 
-      // tripPoitsElements.push(tripPoint.render());
+      // DaysTrip.push(tripPoint.render());
     }
 
   });
 
-  renderElements(tripPointsContainer, tripPoitsElements);
+  renderElements(tripPointsContainer, DaysTrip);
 };
 
 
@@ -143,7 +150,7 @@ const init = () => {
   .then((data) => {
     // console.log('getPoints', data);
     const tripPointsEntities = data.map((it) => new TripPointEntity(it));
-    const tripPointsEntities0 = new TaskModel(data.map((it) => new TripPointEntity(it)));
+    const tripPointsEntities0 = new TripModel(data.map((it) => new TripPointEntity(it)));
 
     // console.log('tripPointsEntities', tripPointsEntities);
     console.log('tripPointsEntities0', tripPointsEntities0);
@@ -200,11 +207,30 @@ const init = () => {
     document.querySelector(`.trip-controls__new-event`).addEventListener(`click`, () => {
 
       const newPointEntity = new TripPointEntity(tripPointsEntities0.dataForNewTripPoint);
+
+
+      // const newPointEntity = new TripPointEntity({tripPointsEntities0.dataForNewTripPoint});
       const editTripPointNew = new TripPointEdit(newPointEntity);
+
 
       editTripPointNew.onSubmit = (newData) => {
         // console.log(newData);
         return tripPointsEntities0.add(newData)
+        .then((response) => {
+console.log(response);
+
+          const TripPointNewEntity = new TripPointEntity(response);
+
+          return new TripPoint(TripPointNewEntity);
+        })
+        .then((entity) => {
+          const oneDayTripPointContainer = oneDayTripPointsTemplate.cloneNode(true);
+          const oneDayItems = [oneDayTripPointContainer.querySelector(`.trip-day__items`)];
+
+
+          oneDayItems.appendChild(entity.render());
+          renderElements(tripPointsContainer, oneDayItems);
+        })
         .then(() => {
           editTripPointNew.unrender();
         });
@@ -218,10 +244,10 @@ const init = () => {
       tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
     });
   })
-  .catch(() => {
-    tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
-    // console.log(response);
-  });
+  // .catch((error) => {
+  //   tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
+  //   console.error(error);
+  // });
 
 };
 

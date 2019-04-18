@@ -124,7 +124,8 @@ class TripPoint extends Component {
           this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
           evt.target.remove();
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error(error);
           console.log('ошибка при выполнение _onAddOffer');
           this.element.classList.add(`shake`);
         });

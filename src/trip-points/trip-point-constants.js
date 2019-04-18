@@ -1,11 +1,12 @@
 import {API} from '../api.js';
 
-const AUTHORIZATION = `Basic dXwYXgthhgugjzj9xxgZAo=0`;
+const AUTHORIZATION = `Basic dXgthgYHGjhgugjzjgZAo=0`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 let Offers = {};
 let Destinations = {};
+// let Destinations = new Map();
 
 let typeTripPoint = {
   'taxi': {

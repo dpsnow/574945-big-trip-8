@@ -7,7 +7,7 @@ import {TripPointEntity} from './trip-points/trip-point-entity.js';
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-class TaskModel {
+class TripModel {
   constructor(data) {
     this._data = data;
     this._currentFilter = `Everything`;
@@ -18,24 +18,25 @@ class TaskModel {
     return this._data;
   }
 
-  getById(id) {
-
-  }
+  // getById(id) {
+  //   return api.getPoint(id);
+  // }
 
   add(task) {
     return api.createTask(task);
   }
 
   get dataForNewTripPoint() {
+    console.log(this.generalInfo);
     return {
       [`date_from`]: this.generalInfo.finishDate,
       isNewTripPoint: true,
       id: +this.generalInfo.lastId + 1,
       [`date_to`]: ``,
-      type: `taxi`,
-      destination: {name: ``, description: ``, pictures: []},
-      [`base_price`]: 0,
-      offers: [],
+      // type: `taxi`,
+      // destination: {name: `anywhere`, description: ``, pictures: []},
+      [`base_price`]: parseInt(this.generalInfo.totalPrice / this._data.length, 10),
+      // offers: [],
     };
   }
 
@@ -108,7 +109,6 @@ class TaskModel {
   get generalInfo() {
     const correctData = this._data.filter((it) => Boolean(it));
     correctData.sort((a, b) => a.timeStart - b.timeStart);
-    // console.log('correctData', correctData);
 
     return {
       cites: new Set(correctData.map((tripPoint) => tripPoint.destination.name)),
@@ -122,4 +122,4 @@ class TaskModel {
   }
 }
 
-export {TaskModel};
+export {TripModel};

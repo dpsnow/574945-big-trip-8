@@ -4,7 +4,7 @@ import moment from 'moment';
 import {isFunction, createElement, renderElements} from '../utils.js';
 
 import {Component} from '../component.js';
-import {getTemplate} from '../template/trip-point-edit-template.js';
+import {getTemplate, renderAllOffers} from '../template/trip-point-edit-template.js';
 
 import {typeTripPoint, Destinations} from '../trip-points/trip-point-constants.js';
 
@@ -13,6 +13,8 @@ import '../../node_modules/flatpickr/dist/themes/material_green.css';
 
 class TripPointEdit extends Component {
   constructor(data) {
+    // console.log('from TripPointEdit', data);
+    // console.log('typeTripPoint', typeTripPoint);
     super();
     this._id = data.id;
     this._timeStart = data.timeStart;
@@ -26,6 +28,7 @@ class TripPointEdit extends Component {
 
     this._flatpickrTo = null;
     this._flatpickrFrom = null;
+    this._flatpickrDay = null;
 
     this._icon = data.icon;
 
@@ -69,10 +72,11 @@ class TripPointEdit extends Component {
 
   _convertDate(formData) {
     const convertedData = {};
-
-    this._offers.forEach((offer) => {
-      offer.accepted = false;
-    });
+    if (this._offers) {
+      this._offers.forEach((offer) => {
+        offer.accepted = false;
+      });
+    }
 
     for (const pair of formData.entries()) {
       const [property, value] = pair;
@@ -130,7 +134,8 @@ class TripPointEdit extends Component {
 
     if (isFunction(this._onSubmit)) {
       this._onSubmit(updateDate)
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         this._element.classList.toggle(`shake`, true);
         this._element.querySelector(`button[type=submit]`).textContent = `Save`;
         this._element.querySelector(`button[type=submit]`).disabled = false;
@@ -154,7 +159,8 @@ class TripPointEdit extends Component {
       .then(() => {
         this.unrender();
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         this._element.classList.toggle(`shake`, true);
         this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
         this._element.querySelector(`button[type=submit]`).disabled = false;
@@ -215,7 +221,7 @@ class TripPointEdit extends Component {
     const inputTimeFrom = this._element.querySelector(`.point__input[name="date-start"]`);
     const inputTimeTo = this._element.querySelector(`.point__input[name="date-end"]`);
 
-    this._flatpickrTo = flatpickr(inputTimeFrom, {
+    this._flatpickrFrom = flatpickr(inputTimeFrom, {
       enableTime: true,
       altFormat: `H:i`,
       [`time_24hr`]: true,
@@ -223,8 +229,8 @@ class TripPointEdit extends Component {
       dateFormat: `U`
     });
 
-    this._flatpickrFrom = flatpickr(inputTimeTo, {
-      minDate: moment(inputTimeFrom.value, `X`).format(`YYYY-MM-DD`),
+    this._flatpickrTo = flatpickr(inputTimeTo, {
+      minDate: moment(this._timeStart, `x`).format(`YYYY-MM-DD`),
       enableTime: true,
       altFormat: `H:i`,
       [`time_24hr`]: true,
@@ -233,8 +239,27 @@ class TripPointEdit extends Component {
     });
 
     inputTimeFrom.addEventListener(`change`, (evt) => {
-      this._flatpickrFrom.config.minDate = evt.target.value;
+      this._flatpickrTo.config.minDate = evt.target.value;
     });
+
+    if (this._isNewTripPoint) {
+      const inputDay = this._element.querySelector(`.point__input[name=day]`);
+
+      this._flatpickrDay = flatpickr(inputDay, {
+        defaultDate: this._timeStart,
+        altFormat: `d M`,
+        altInput: true,
+        dateFormat: `U`
+      });
+
+      inputDay.addEventListener(`change`, (evt) => {
+        this._flatpickrFrom.setDate(evt.target.value);
+      });
+
+      inputTimeFrom.addEventListener(`change`, (evt) => {
+        this._flatpickrDay.setDate(evt.target.value);
+      });
+    }
   }
 
   _destroyFlatpickr() {
