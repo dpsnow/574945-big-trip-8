@@ -36,17 +36,10 @@ class TripPointEntity {
   }
 
   getDay(startDate) {
-    // console.log(startDate);
-    // console.log(this.timeStart);
-    // console.log(moment.duration(moment(this.timeStart).diff(startDate)));
-    // console.log(moment(startDate).date());
-    // console.log(moment(this.timeStart).date());
-    // console.log(moment(this.timeStart).diff(startDate, 'days'));
-
-
-    // return moment(this.timeStart).date() - moment(this.timeStart).date();
-    return moment(this.timeStart).diff(startDate, `days`) + 1;
-    // return moment.duration(moment(startDate, `x`).diff(moment(this.timeStart, `x`))).asDays();
+    // console.log(`-----------------------------`);
+    // console.log(`this.timeStart = ${moment(this.timeStart).date()}; startDate = ${moment(startDate).date()};`);
+    // return moment(this.timeStart).diff(startDate, `days`);
+    return moment(this.timeStart).date() - moment(startDate).date() + 1;
   }
 
   get isVisible() {

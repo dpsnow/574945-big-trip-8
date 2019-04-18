@@ -19,19 +19,22 @@ const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
 const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointsContainer = document.querySelector(`.trip-points`);
-const oneDayTripPointsTemplate = tripPointsContainer.querySelector(`.trip-day`);
 
 let viewStatistics = false;
+let isSorted = false;
+let daysTrip = new Map();
 
 
 const renderTripPoints = (entitiesTripPoints) => {
+  // daysTrip = new Map();
+  daysTrip.clear();
   console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
   tripPointsContainer.innerHTML = ``;
 
-  const DaysTrip = [];
   let dayTrip;
-  // let isEditMode;
   let oneDayTripPoint;
+
+  let oneDayItems;
 
   entitiesTripPoints.data.forEach((pointEntity, i) => {
     // console.log('pointEntity', pointEntity);
@@ -44,16 +47,26 @@ const renderTripPoints = (entitiesTripPoints) => {
     let currentDay = pointEntity.getDay(entitiesTripPoints.generalInfo.startDate);
     let currentDate = pointEntity.date;
 
-    if (dayTrip !== currentDay) {
+    let dayElement = daysTrip.get(currentDay);
+
+    if (!dayElement) {
       oneDayTripPoint = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
       oneDayTripPoint.render();
+      oneDayItems = oneDayTripPoint.containerForPoints;
 
       dayTrip = currentDay;
-
-      // oneDayTripPoint.element.querySelector(`.trip-day__title`).textContent = formatDate(currentDate, `DD MMM`);
-      // oneDayTripPoint.element.querySelector(`.trip-day__number`).textContent = count;
+    } else {
+      oneDayItems = dayElement.querySelector('.trip-day__items');
     }
 
+    // if (dayTrip !== currentDay) {
+    //   oneDayTripPoint = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
+    //   oneDayTripPoint.render();
+
+    //   dayTrip = currentDay;
+    // }
+
+    console.log('oneDayTripPoint', oneDayTripPoint);
 
     if (pointEntity.isVisible) {
 
@@ -123,117 +136,130 @@ const renderTripPoints = (entitiesTripPoints) => {
       };
 
 
-      DaysTrip.push(oneDayTripPoint.element);
+      // daysTrip0.push(oneDayTripPoint.element);
 
-      const oneDayItems = oneDayTripPoint.containerForPoints;
-      console.log(oneDayTripPoint);
+      // console.log('daysTrip0', daysTrip0);
+      console.log('oneDayItems', oneDayItems);
+
+      // const oneDayItems = oneDayTripPoint.containerForPoints;
       oneDayItems.appendChild(tripPoint.render());
+      // oneDayTripPoint.addPointElement(tripPoint.render());
 
-      // DaysTrip.push(tripPoint.render());
+      // daysTrip.push(tripPoint.render());
+      console.log(oneDayTripPoint);
+      daysTrip.set(dayTrip, oneDayTripPoint.element);
     }
 
   });
 
-  renderElements(tripPointsContainer, DaysTrip);
-};
+  console.log('daysTrip', daysTrip);
 
+  renderElements(tripPointsContainer, daysTrip.values());
+};
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-const init = () => {
-  // const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
-  // const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
-  // console.log(tripPointsEntities);
-  tripPointsContainer.innerHTML = `<p style="text-align: center;">Loading route...</p>`;
+// const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
+// const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
+// console.log(tripPointsEntities);
+tripPointsContainer.innerHTML = `<p style="text-align: center;">Loading route...</p>`;
+renderFilters(filtersContainer);
 
-  api.getPoints()
+api.getPoints()
   .then((data) => {
     // console.log('getPoints', data);
-    const tripPointsEntities = data.map((it) => new TripPointEntity(it));
-    const tripPointsEntities0 = new TripModel(data.map((it) => new TripPointEntity(it)));
+    const tripPointsEntities = new TripModel(data.map((it) => new TripPointEntity(it)));
 
     // console.log('tripPointsEntities', tripPointsEntities);
-    console.log('tripPointsEntities0', tripPointsEntities0);
+    console.log('tripPointsEntities', tripPointsEntities);
 
-    // tripPointsContainer.innerHTML = ``;
-    // renderTripPoints(tripPointsEntities);
-    renderTripPoints(tripPointsEntities0);
+    tripPointsEntities.sort(`day`);
 
-    updateGeneralInfo(tripPointsEntities0.generalInfo);
+    renderTripPoints(tripPointsEntities);
+    updateGeneralInfo(tripPointsEntities.generalInfo);
 
-    // renderFilters(filtersData);
-    renderFilters(filtersContainer);
-
+    return tripPointsEntities;
+  })
+  .then((tripPointsEntities) => {
     initStats();
-
     // сортировка
     document.querySelector(`.trip-sorting`).addEventListener(`change`, (evt) => {
       // console.log('Сортировка по ', evt.target.value);
-      // tripPointsContainer.innerHTML = ``;
-      tripPointsEntities0.sort(evt.target.value);
-      renderTripPoints(tripPointsEntities0);
+      tripPointsEntities.sort(evt.target.value);
+      renderTripPoints(tripPointsEntities);
     });
 
     // фильтрация по времени
     filtersContainer.addEventListener(`change`, (evt) => {
-      // tripPointsContainer.innerHTML = ``;
-
-      tripPointsEntities0.filter(evt.target.value);
-      // filterTripPoint(tripPointsEntities, evt.target.value);
+      tripPointsEntities.filter(evt.target.value);
 
       if (viewStatistics) {
-        updateStats(tripPointsEntities0.data);
+        updateStats(tripPointsEntities.data);
       } else {
-        // renderTripPoints(tripPointsEntities);
-        renderTripPoints(tripPointsEntities0);
+        renderTripPoints(tripPointsEntities);
       }
     });
 
     // показ статистики
     linkViewStatistics.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      viewStatistics = toggleVisibilityStatistics(true);
-      updateStats(tripPointsEntities);
+      if (!viewStatistics) {
+        viewStatistics = toggleVisibilityStatistics(true);
+        updateStats(tripPointsEntities.data);
+      }
     });
 
     // показ точек путешествия
     linkViewTable.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      viewStatistics = toggleVisibilityStatistics(false);
-      renderTripPoints(tripPointsEntities0);
+      if (viewStatistics) {
+        viewStatistics = toggleVisibilityStatistics(false);
+        renderTripPoints(tripPointsEntities);
+      }
     });
 
     // создание новой точки путешествия
     document.querySelector(`.trip-controls__new-event`).addEventListener(`click`, () => {
-
-      const newPointEntity = new TripPointEntity(tripPointsEntities0.dataForNewTripPoint);
-
-
-      // const newPointEntity = new TripPointEntity({tripPointsEntities0.dataForNewTripPoint});
+      const newPointEntity = new TripPointEntity(tripPointsEntities.dataForNewTripPoint);
       const editTripPointNew = new TripPointEdit(newPointEntity);
 
+      tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
 
       editTripPointNew.onSubmit = (newData) => {
         // console.log(newData);
-        return tripPointsEntities0.add(newData)
-        .then((response) => {
-console.log(response);
+        return tripPointsEntities.add(newData)
+          .then((response) => {
+            console.log(response);
 
-          const TripPointNewEntity = new TripPointEntity(response);
+            const tripPointNewEntity = new TripPointEntity(response);
+            const newTripPoint = new TripPoint(tripPointNewEntity);
 
-          return new TripPoint(TripPointNewEntity);
-        })
-        .then((entity) => {
-          const oneDayTripPointContainer = oneDayTripPointsTemplate.cloneNode(true);
-          const oneDayItems = [oneDayTripPointContainer.querySelector(`.trip-day__items`)];
+            // проверить уже существующий контейнер день
+            const dayNewTrip = tripPointNewEntity.getDay(tripPointsEntities.generalInfo.startDate);
+            console.log('dayNewTrip', dayNewTrip);
+            console.log('daysTrip', daysTrip);
+            // console.log(daysTrip.get(dayNewTrip));
 
+            let dayElement = daysTrip.get(dayNewTrip);
 
-          oneDayItems.appendChild(entity.render());
-          renderElements(tripPointsContainer, oneDayItems);
-        })
-        .then(() => {
-          editTripPointNew.unrender();
-        });
+            if (!dayElement) {
+              dayElement = new DayTrip(dayNewTrip, formatDate(tripPointNewEntity.date, `DD MMM`));
+              dayElement.render();
+              // dayElement = dayElement.containerForPoints;
+              dayElement.containerForPoints.appendChild(newTripPoint.render());
+              tripPointsContainer.appendChild(dayElement.element);
+            } else {
+              dayElement = dayElement.querySelector('.trip-day__items');
+              dayElement.appendChild(newTripPoint.render());
+            }
+
+            console.log('tripPointsContainer', tripPointsContainer);
+            console.log('dayElement', dayElement);
+
+          })
+          .then(() => {
+            editTripPointNew.unrender();
+          });
 
       };
 
@@ -241,16 +267,9 @@ console.log(response);
       // console.log(editTripPointNew);
       // editTripPointNew.render();
 
-      tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
     });
   })
-  // .catch((error) => {
-  //   tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
-  //   console.error(error);
-  // });
-
-};
-
-
-init();
-
+  .catch((error) => {
+    tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
+    console.error(error);
+  });

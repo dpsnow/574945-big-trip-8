@@ -1,5 +1,5 @@
 import {Component} from '../component.js';
-import {getTemplate} from '../template/filter-template.js';
+import {getTemplate} from './filter-template.js';
 
 class Filter extends Component {
   constructor(data) {

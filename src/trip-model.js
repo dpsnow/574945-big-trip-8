@@ -1,8 +1,6 @@
 import {API} from './api.js';
 import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
 
-import {TripPointEntity} from './trip-points/trip-point-entity.js';
-
 // import {formatDate} from './utils.js';
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -27,16 +25,13 @@ class TripModel {
   }
 
   get dataForNewTripPoint() {
-    console.log(this.generalInfo);
+    console.log('generalInfo', this.generalInfo);
     return {
       [`date_from`]: this.generalInfo.finishDate,
       isNewTripPoint: true,
       id: +this.generalInfo.lastId + 1,
       [`date_to`]: ``,
-      // type: `taxi`,
-      // destination: {name: `anywhere`, description: ``, pictures: []},
       [`base_price`]: parseInt(this.generalInfo.totalPrice / this._data.length, 10),
-      // offers: [],
     };
   }
 
@@ -46,10 +41,6 @@ class TripModel {
 
   delete(id) {
     return api.deleteTask(id);
-  }
-
-  render(container) {
-    this.sort(this._currentSort);
   }
 
   filter(value) {
@@ -96,10 +87,10 @@ class TripModel {
         return this._data.sort((a, b) => (a.type < b.type) ? -1 : 1);
 
       case `time`:
-        return this._data.sort((a, b) => a.duration.valueOf() - b.duration.valueOf());
+        return this._data.sort((a, b) => b.duration.valueOf() - a.duration.valueOf());
 
       case `price`:
-        return this._data.sort((a, b) => a.totalPrice - b.totalPrice);
+        return this._data.sort((a, b) => b.totalPrice - a.totalPrice);
 
       default:
         return this._data.sort((a, b) => a.timeStart - b.timeStart);

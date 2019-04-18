@@ -14,6 +14,10 @@ class DayTrip extends Component {
     return getTemplate(this);
   }
 
+  addPointElement(element) {
+    this._element.querySelector(`.trip-day__items`).appendChild(element);
+  }
+
   get containerForPoints() {
     return this._element.querySelector(`.trip-day__items`);
   }

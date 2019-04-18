@@ -15,8 +15,8 @@ export const renderAllOffers = (point) => {
 };
 
 export const getTemplate = (point) => {
-  console.log('from TripPointEdit', point);
-  console.log('Destinations', Destinations);
+  // console.log('from TripPointEdit', point);
+  // console.log('Destinations', Destinations);
   return `
   <article class="point">
   <form action="" method="get">
