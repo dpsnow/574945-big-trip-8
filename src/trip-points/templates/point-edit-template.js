@@ -1,13 +1,14 @@
-import {formatDate} from '../utils.js';
-import {typeTripPoint, Offers} from '../trip-points/trip-point-constants.js';
+import {formatDate} from '../../utils/utils.js';
+import {typeTripPoint, Destinations} from '../trip-point-constants.js';
 
 export const renderAllOffers = (point) => {
-  return point._allOffers.map((offer) => {
+  // const currentArrayOffers = point._offers || typeTripPoint[point._type].offers;
+  return point._offers.map((offer, index) => {
     return `
-    <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" name="offer" value="${offer}"
-    ${point._addedOffers.includes(offer) ? `checked` : ``}>
-    <label for="${offer}" class="point__offers-label">
-      <span class="point__offer-service">${Offers[offer]}</span> + €<span class="point__offer-price">25</span>
+    <input class="point__offers-input visually-hidden" type="checkbox" id="${point._id}-${index}" name="offer" value="${offer.title}"
+    ${offer.accepted ? `checked` : ``}>
+    <label for="${point._id}-${index}" class="point__offers-label">
+      <span class="point__offer-service">${offer.title || offer.name}</span> + €<span class="point__offer-price">${offer.price}</span>
     </label>
     `;
   }).join(``);
@@ -15,13 +16,14 @@ export const renderAllOffers = (point) => {
 
 export const getTemplate = (point) => {
   // console.log('from TripPointEdit', point);
+  // console.log('Destinations', Destinations);
   return `
   <article class="point">
   <form action="" method="get">
     <header class="point__header">
       <label class="point__date">
         choose day
-        <input class="point__input" type="text" placeholder="MAR 18" name="day">
+        <input class="point__input" type="text" placeholder="MAR 18" name="day" value="${formatDate(point._timeStart, `X`)}">
       </label>
 
       <div class="travel-way">
@@ -39,19 +41,17 @@ export const getTemplate = (point) => {
 
       <div class="point__destination-wrap">
         <label class="point__destination-label" for="destination">${typeTripPoint[point._type].text}</label>
-        <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination}" name="destination">
+        <input class="point__destination-input" list="destination-select" id="destination" value="${point._destination.name}" name="destination" required >
         <datalist id="destination-select">
-          <option value="airport"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
-          <option value="hotel"></option>
+          ${Object.keys(Destinations).map((city) => `<option value="${city}"></option>`).join(``)}
         </datalist>
       </div>
 
-      <label class="point__time">
+      <div class="point__time">
         choose time
-        <input class="point__input" type="text" value="${formatDate(point._timeStart, `X`)} — ${formatDate(point._timeEnd, `X`)}" name="time" placeholder="00:00&nbsp;&mdash;&nbsp;00:00">
-      </label>
+        <input class="point__input" type="text" value="${formatDate(point._timeStart, `X`)}" name="date-start" placeholder="19:00" required>
+        <input class="point__input" type="text" value="${formatDate(point._timeEnd, `X`)}" name="date-end" placeholder="21:00" required>
+      </div>
 
       <label class="point__price">
         write price
@@ -74,19 +74,16 @@ export const getTemplate = (point) => {
       <section class="point__offers">
         <h3 class="point__details-title">offers</h3>
 
-        <div class="point__offers-wrap">${renderAllOffers(point)}
+        <div class="point__offers-wrap">${point._offers ? renderAllOffers(point) : `No avaliable offers`}
         </div>
 
       </section>
       <section class="point__destination">
         <h3 class="point__details-title">Destination</h3>
-        <p class="point__destination-text">${point._description}</p>
-        <div class="point__destination-images">
-          <img src="${point._picture}" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/300/200?r=1234" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/300/100?r=12345" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/200/300?r=123456" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/100/300?r=1234567" alt="picture from place" class="point__destination-image">
+        <p class="point__destination-text">${point._destination.description || `No descrition for this destination`}</p>
+
+        <div class="point__destination-images"${point._destination.pictures.length ? `` : ` style="display:none"`}>
+         ${point._destination.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``)}
         </div>
       </section>
       <input type="hidden" class="point__total-price" name="total-price" value="">

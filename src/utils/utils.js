@@ -35,6 +35,7 @@ const getRandomValueFromArray = (array) => {
  * @return {NodeList} - список DOM-элемент
  */
 const createElement = (html) => {
+  // console.log(html);
   const element = parser.parseFromString(html, `text/html`);
   // console.log(`createElement childNodes`, element.body.childNodes);
   return element.body.childNodes;
@@ -49,7 +50,8 @@ const createElement = (html) => {
  */
 const renderElements = (container, elements) => {
   const fragment = document.createDocumentFragment();
-  elements.forEach((element) => {
+  // console.log(elements);
+  [...elements].forEach((element) => {
     // console.log(element);
     fragment.appendChild(element);
   });
@@ -70,7 +72,7 @@ const getRandomArray = (array, maxQty, minQty = 0) => {
 
 const formatDate = (date, format) => {
   // console.log(`formatDate:, date = ${date} typeof ${typeof date},  format = ${format}  typeof ${typeof format}`);
-  return moment(date).isValid() ? moment(date).format(format) : ``;
+  return moment(date, `x`).isValid() ? moment(date, `x`).format(format) : ``;
 };
 
 const updateTime = (date, time) => {

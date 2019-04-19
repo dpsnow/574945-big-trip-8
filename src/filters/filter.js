@@ -1,6 +1,5 @@
-import {isFunction} from '../utils.js';
 import {Component} from '../component.js';
-import {getTemplate} from '../template/filter-template.js';
+import {getTemplate} from './filter-template.js';
 
 class Filter extends Component {
   constructor(data) {
@@ -8,27 +7,13 @@ class Filter extends Component {
     super();
     this._name = data.name;
     this._checked = data.checked || false;
-    this._onChangeFilter = this._onChangeFilter.bind(this);
+    this._onFilter = data.onFilter;
   }
 
   get template() {
     return getTemplate(this);
   }
 
-  set onFilter(fn) {
-    this._onFilter = fn;
-  }
-
-  _onChangeFilter(evt) {
-    // console.log(`_onChangeFilter`);
-    if (isFunction(this._onFilter)) {
-      this._onFilter(evt);
-    }
-  }
-
-  bind() {
-    this._element.querySelector(`[name=filter]`).addEventListener(`change`, this._onChangeFilter);
-  }
 }
 
 export {Filter};

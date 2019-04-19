@@ -1,186 +1,264 @@
-import {filtersData, getTripPointsData} from './data.js';
-import {renderElements} from './utils.js';
+import {API} from './api.js';
+import {renderElements, formatDate} from './utils/utils.js';
+import {updateGeneralInfo} from './utils/update-general-info.js';
 
-import {horizontalChart} from './statistics.js';
+import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
-import {Filter} from './filters/filter.js';
+import {renderFilters} from './utils/render-filters.js';
 
-import {typeTripPoint} from './trip-points/trip-point-constants.js';
-import {TripPointEntity} from './trip-points/trip-point-entity.js';
-import {TripPoint} from './trip-points/trip-point.js';
-import {TripPointEdit} from './trip-points/trip-point-edit.js';
+import {DayTrip} from "./day-trip/day-trip.js";
 
-const NUMBER_TRIP_POINTS_ON_PAGE = 7;
-// const MAX_TRIP_POINTS = 10;
+import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
+import {TripPointEntity} from './trip-point-entity.js';
+import {Point} from './trip-points/point.js';
+import {PointEdit} from './trip-points/point-edit.js';
 
-const tableContainer = document.getElementById(`table`);
-const statsContainer = document.getElementById(`stats`);
+import {TripModel} from "./trip-model";
 
 const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
 const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
 const filtersContainer = document.querySelector(`.trip-filter`);
-const tripPointContainer = document.querySelector(`.trip-day__items`);
+const tripPointsContainer = document.querySelector(`.trip-points`);
 
-const moneyCtx = document.querySelector(`.statistic__money`);
-const transportCtx = document.querySelector(`.statistic__transport`);
+const btnNewEvent = document.querySelector(`.trip-controls__new-event`);
 
 let viewStatistics = false;
-let moneyStats;
-let transportStats;
+let edtingMode = null;
 
-
-const filterTripPoint = (tripPoints, filterValue) => {
-  // фильтрация по времени заменена на фильтрацию по цене для удобства
-  switch (filterValue) {
-    case `Future`:
-      return tripPoints.forEach((point) => {
-        // point.isVisible = Boolean(point.timeStart > Date.now());
-        point.isVisible = point.price > 200;
-      });
-
-    case `Past`:
-      return tripPoints.forEach((point) => {
-        // point.isVisible = Boolean(point.timeEnd < Date.now());
-        point.isVisible = point.price < 100;
-      });
-
-    default:
-      return tripPoints.forEach((point) => {
-        point.isVisible = true;
-      });
-  }
-};
-
-
-const renderFilters = (dataFilters) => {
-  const filterElements = [];
-
-  dataFilters.forEach((data) => {
-    const filter = new Filter(data);
-    filter.render();
-    filterElements.push(filter.element);
-    filter.onFilter = () => {
-      // console.log(`onFilter`, evt);
-      // не понятно что должна выполнять функция, обработчик фильтра на строке 108
-    };
-  });
-
-  // console.log(filterElements);
-  renderElements(filtersContainer, filterElements);
-};
-
+let allDaysTrip = [];
 
 const renderTripPoints = (entitiesTripPoints) => {
+  let oneDayTrip;
+  allDaysTrip = [];
+  tripPointsContainer.innerHTML = ``;
+  let dayTrip;
+
+  // entitiesTripPoints.sort(stateSort);
+
   // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
 
-  const tripPoitsElements = [];
+  entitiesTripPoints.data.forEach((pointEntity, i) => {
+    // console.log('pointEntity', pointEntity);
+    // console.log(formatDate(pointEntity.day, `DD MMM`));
 
-  entitiesTripPoints.forEach((pointEntity, i) => {
+    if (pointEntity === null || pointEntity.destination === undefined) {
+      return;
+    }
+
+    let currentDay = pointEntity.getDay(entitiesTripPoints.generalInfo.startDate);
+    let currentDate = pointEntity.date;
+    let oneDayItems;
+
+    if (dayTrip !== currentDay) {
+      oneDayTrip = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
+      // oneDayTripPoint = new DayTrip(currentDay, moment(currentDate).format('DD MMM'));
+      oneDayTrip.render();
+      dayTrip = currentDay;
+    }
+
+    // console.log('oneDayTripPoint', oneDayTripPoint);
+
     if (pointEntity.isVisible) {
-      const tripPoint = new TripPoint(pointEntity);
-      const editTripPoint = new TripPointEdit(pointEntity);
 
-      tripPoint.onEdit = () => {
-        editTripPoint.render();
-        tripPointContainer.replaceChild(editTripPoint.element, tripPoint.element);
-        tripPoint.unrender();
+      const tripPoint = new Point(pointEntity);
+      const editTripPoint = new PointEdit(pointEntity);
+
+      allDaysTrip.push(oneDayTrip.element);
+
+      oneDayItems = oneDayTrip.containerForPoints;
+
+
+      editTripPoint.onCancelEditMode = () => {
+        tripPoint.render();
+        oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
+        editTripPoint.unrender();
+
+        // isEditMode = false;
+
+        edtingMode = null;
+
       };
 
-      editTripPoint.onSubmit = (updateDate) => {
+      editTripPoint.onSubmit = (newData) => {
         // console.log(`updateDate [${i}]`, updateDate);
-        entitiesTripPoints[i] = updateDate;
+        return entitiesTripPoints.update(newData)
+            .then((updatedData) => {
+              entitiesTripPoints.data[i].update(updatedData);
 
-        tripPoint.update(updateDate);
-        tripPoint.render();
-        tripPointContainer.replaceChild(tripPoint.element, editTripPoint.element);
-        editTripPoint.unrender();
-        // console.log(`after update tripPointsData`, entitiesTripPoints);
+              tripPoint.update(entitiesTripPoints.data[i]);
+
+              // старый варинт без изменений контейнера дня
+              // tripPoint.render();
+              // oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
+              // editTripPoint.unrender();
+
+
+              // обновлять все точки вместо замены, из-за того что нужно обновлять контейнер дни путешествий
+              // console.log('entitiesTripPoints', entitiesTripPoints);
+              renderTripPoints(entitiesTripPoints);
+
+              updateGeneralInfo(entitiesTripPoints.generalInfo, `all`);
+              edtingMode = null;
+            });
       };
 
       editTripPoint.onDelete = () => {
-        // console.log(`pointEntity [${i}]`, pointEntity);
-        entitiesTripPoints[i] = null;
-        editTripPoint.unrender();
+        // console.log(`onDelete [${i}]`, entitiesTripPoints.data[i]);
+
+        return entitiesTripPoints.delete(entitiesTripPoints.data[i].id)
+            .then(() => {
+              // console.log(' entitiesTripPoints.update', updatedData);
+              delete entitiesTripPoints.data[i];
+              // editTripPoint.unrender();
+              updateGeneralInfo(entitiesTripPoints.generalInfo);
+
+              // обновлять все
+              renderTripPoints(entitiesTripPoints);
+              edtingMode = null;
+            });
       };
 
-      tripPoitsElements.push(tripPoint.render());
+      tripPoint.onEdit = () => {
+        // console.log(edtingMode);
+        if (edtingMode !== null) {
+          edtingMode.closeEditPoint();
+        }
+
+        editTripPoint.update(pointEntity);
+        editTripPoint.render();
+        oneDayItems.replaceChild(editTripPoint.element, tripPoint.element);
+        edtingMode = editTripPoint;
+        tripPoint.unrender();
+
+        // isEditMode = true;
+      };
+
+      tripPoint.onAddOffer = () => {
+        // tripPoint.update(entitiesTripPoints[i]);
+        // console.log(`updateDate [${i}]`);
+
+        return entitiesTripPoints.update(tripPoint.toRaw)
+            .then((updatedData) => {
+              // console.log(' tripPoint.onAddOffer', updatedData);
+              entitiesTripPoints.data[i].update(updatedData);
+              tripPoint.update(entitiesTripPoints.data[i]);
+              updateGeneralInfo(entitiesTripPoints.generalInfo, `totalPrice`);
+            });
+      };
+
+
+      oneDayItems.appendChild(tripPoint.render());
     }
+
   });
 
-  renderElements(tripPointContainer, tripPoitsElements);
+  // console.log('daysTrip', daysTrip);
+
+  renderElements(tripPointsContainer, allDaysTrip);
 };
 
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-const toggleVisibilityStatistics = (value) => {
-  viewStatistics = value;
-  linkViewStatistics.classList.toggle(`view-switch__item--active`, value);
-  statsContainer.classList.toggle(`visually-hidden`, !value);
+// const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
+// const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
+// console.log(tripPointsEntities);
+tripPointsContainer.innerHTML = `<p style="text-align: center;">Loading route...</p>`;
+renderFilters(filtersContainer);
 
-  linkViewTable.classList.toggle(`view-switch__item--active`, !value);
-  tableContainer.classList.toggle(`visually-hidden`, value);
-};
+api.getPoints()
+  .then((data) => {
+    // console.log('getPoints', data);
+    const tripPointsEntities = new TripModel(data.map((it) => new TripPointEntity(it)));
 
+    // console.log('tripPointsEntities', tripPointsEntities);
+    // console.log('tripPointsEntities', tripPointsEntities);
 
-const renderStats = (allData) => {
-  if (moneyStats !== undefined) {
-    moneyStats.destroy();
-  }
-  if (transportStats !== undefined) {
-    transportStats.destroy();
-  }
+    tripPointsEntities.sort(`day`);
 
-  moneyStats = horizontalChart(moneyCtx, `MY MONEY`, getDataForStats(allData, `price`), `€ `);
-  transportStats = horizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);
-};
-
-
-const getDataForStats = (allData, value = `count`) => {
-  const variableForConvert = {};
-
-  allData.forEach((it) => {
-    if (it.isVisible) {
-      variableForConvert[it.type] = (variableForConvert[it.type] || 0) + (value === `count` ? 1 : it[value]);
-    }
-  });
-
-  return {
-    labels: Object.keys(variableForConvert).map((el) => `${typeTripPoint[el].icon} ${el.toUpperCase()}`),
-    values: Object.values(variableForConvert)
-  };
-};
-
-
-const init = () => {
-  const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
-  const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
-  // console.log(tripPointsEntities);
-
-  renderFilters(filtersData);
-  renderTripPoints(tripPointsEntities);
-
-  filtersContainer.addEventListener(`change`, (evt) => {
-    tripPointContainer.innerHTML = ``;
-    filterTripPoint(tripPointsEntities, evt.target.value);
     renderTripPoints(tripPointsEntities);
+    updateGeneralInfo(tripPointsEntities.generalInfo);
 
-    if (viewStatistics) {
-      renderStats(tripPointsEntities);
-    }
+    return tripPointsEntities;
+  })
+  .then((tripPointsEntities) => {
+    initStats();
+    // сортировка
+    document.querySelector(`.trip-sorting`).addEventListener(`change`, (evt) => {
+      // console.log('Сортировка по ', evt.target.value);
+      tripPointsEntities.sort(evt.target.value);
+      // stateSort = evt.target.value;
+      renderTripPoints(tripPointsEntities);
+    });
+
+    // фильтрация по времени
+    filtersContainer.addEventListener(`change`, (evt) => {
+      tripPointsEntities.filter(evt.target.value);
+
+      if (viewStatistics) {
+        updateStats(tripPointsEntities.data);
+      } else {
+        renderTripPoints(tripPointsEntities);
+      }
+    });
+
+    // показ статистики
+    linkViewStatistics.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      if (!viewStatistics) {
+        viewStatistics = toggleVisibilityStatistics(true);
+        updateStats(tripPointsEntities.data);
+      }
+    });
+
+    // показ точек путешествия
+    linkViewTable.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      if (viewStatistics) {
+        viewStatistics = toggleVisibilityStatistics(false);
+        renderTripPoints(tripPointsEntities);
+      }
+    });
+
+    // создание новой точки путешествия
+    btnNewEvent.addEventListener(`click`, () => {
+      btnNewEvent.disabled = true;
+
+      const newPointEntity = new TripPointEntity(tripPointsEntities.dataForNewTripPoint);
+      const editTripPointNew = new PointEdit(newPointEntity);
+      tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
+
+      editTripPointNew.onSubmit = (newData) => {
+        // console.log(newData);
+        return tripPointsEntities.add(newData)
+          .then((response) => {
+            // console.log(response);
+            const newTripPointNewEntity = new TripPointEntity(response);
+            // const newTripPoint = new TripPoint(tripPointNewEntity);
+            // console.log(newTripPointNewEntity);
+            // console.log(tripPointsEntities);
+            tripPointsEntities.data.push(newTripPointNewEntity);
+
+            renderTripPoints(tripPointsEntities);
+            updateGeneralInfo(tripPointsEntities.generalInfo);
+
+            btnNewEvent.disabled = false;
+          });
+
+      };
+
+      editTripPointNew.onDelete = () => {
+        // console.log(`onDelete [${i}]`, entitiesTripPoints.data[i]);
+        btnNewEvent.disabled = false;
+      };
+
+      // console.log(newPointEntity);
+      // console.log(editTripPointNew);
+      // editTripPointNew.render();
+
+    });
+  })
+  .catch(() => {
+    tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
+    // console.error(error);
   });
-
-  linkViewStatistics.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-    toggleVisibilityStatistics(true);
-
-    renderStats(tripPointsEntities);
-  });
-
-  linkViewTable.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
-    toggleVisibilityStatistics(false);
-  });
-
-};
-
-init();
