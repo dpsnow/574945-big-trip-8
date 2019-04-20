@@ -28,6 +28,18 @@ const getRandomValueFromArray = (array) => {
   return array[getRandomInt(0, array.length)];
 };
 
+const cleanNode = (node) => {
+  while (node.firstChild) {
+    node.removeChild(node.firstChild);
+  }
+};
+
+const showMsg = (msg, node, state = true) => {
+  node.classList.toggle(`show`, state);
+  node.textContent = msg;
+};
+
+
 /**
  * Переобразовывает HTML код элемента в DOM узлы
  *
@@ -81,4 +93,4 @@ const updateTime = (date, time) => {
   return moment(date, `x`).hours(+hours).minutes(+minutes).format(`x`);
 };
 
-export {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray, createElement, renderElements, isFunction, formatDate, updateTime};
+export {getRandomBoolean, getRandomInt, getRandomValueFromArray, getRandomArray, cleanNode, createElement, renderElements, showMsg, isFunction, formatDate, updateTime};
