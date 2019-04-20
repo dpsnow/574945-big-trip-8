@@ -1,5 +1,5 @@
 import {HorizontalChart} from './horizontal-chart.js';
-import {typeTripPoint} from '../trip-points/trip-point-constants.js';
+import {typeTripPoint, TypeStats} from '../trip-points/trip-point-constants.js';
 
 const moneyCtx = document.querySelector(`.statistic__money`);
 const transportCtx = document.querySelector(`.statistic__transport`);
@@ -16,20 +16,30 @@ let transportStats;
 let timeSpendStats;
 
 
-const getDataForStats = (allData, value = `count`) => {
+const getDataForStats = (allData, value) => {
   // console.log(allData);
   const variableForConvert = {};
 
   allData.forEach((it) => {
     if (it.isVisible) {
-      if (value === `duration`) {
-        variableForConvert[it.type] = (variableForConvert[it.type] || 0) + it[value].asMilliseconds();
-      } else {
-        variableForConvert[it.type] = (variableForConvert[it.type] || 0) + (value === `count` ? 1 : it[value]);
+      let currentValue;
+
+      switch (value) {
+        case TypeStats.DURATION:
+          currentValue = it[value].asMilliseconds();
+          break;
+
+        case TypeStats.COUNT:
+          currentValue = 1;
+          break;
+
+        default:
+          currentValue = it[value];
+          break;
       }
+      variableForConvert[it.type] = (variableForConvert[it.type] || 0) + currentValue;
     }
   });
-
 
   return {
     labels: Object.keys(variableForConvert).map((el) => `${typeTripPoint[el].icon} ${el.toUpperCase()}`),
@@ -54,9 +64,9 @@ const initStats = () => {
 };
 
 const updateStats = (allData) => {
-  moneyStats.update(getDataForStats(allData, `price`));
-  transportStats.update(getDataForStats(allData));
-  timeSpendStats.update(getDataForStats(allData, `duration`));
+  moneyStats.update(getDataForStats(allData, TypeStats.PRICE));
+  transportStats.update(getDataForStats(allData, TypeStats.COUNT));
+  timeSpendStats.update(getDataForStats(allData, TypeStats.DURATION));
 
   // moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, getDataForStats(allData, `price`), `€ `);
   // transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);

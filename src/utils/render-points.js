@@ -15,7 +15,7 @@ const getPoints = (entitiesTripPoints) => {
   let oneDayTrip;
   let edtingMode = null;
 
-  const allDaysTrip = [];
+  const points = [];
 
   let dayTrip;
 
@@ -49,7 +49,7 @@ const getPoints = (entitiesTripPoints) => {
       const tripPoint = new Point(pointEntity);
       const editTripPoint = new PointEdit(pointEntity);
 
-      allDaysTrip.push(oneDayTrip.element);
+      points.push(oneDayTrip.element);
 
       oneDayItems = oneDayTrip.containerForPoints;
 
@@ -141,7 +141,7 @@ const getPoints = (entitiesTripPoints) => {
 
   // console.log('daysTrip', daysTrip);
 
-  return allDaysTrip;
+  return points;
 };
 
 const renderPoints = (pointsEntities) => {

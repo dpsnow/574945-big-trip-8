@@ -69,6 +69,11 @@ class PointEdit extends Component {
     }
   }
 
+  _disabledBtns(isDisabled) {
+    this._element.querySelector(`button[type=reset]`).disabled = isDisabled;
+    this._element.querySelector(`button[type=submit]`).disabled = isDisabled;
+  }
+
   _onESCkeydown(evt) {
     if (evt.keyCode === ESC_KEYCODE && isFunction(this._onCancelEditMode)) {
       this._onCancelEditMode();
@@ -134,8 +139,8 @@ class PointEdit extends Component {
     // console.log(updateDate);
 
     this._element.classList.toggle(`shake`, false);
-    this._element.querySelector(`button[type=reset]`).disabled = true;
-    this._element.querySelector(`button[type=submit]`).disabled = true;
+
+    this._disabledBtns(true);
     this._element.querySelector(`button[type=submit]`).textContent = `Saving....`;
 
     if (isFunction(this._onSubmit)) {
@@ -143,9 +148,9 @@ class PointEdit extends Component {
       .catch(() => {
         // console.error(error);
         this._element.classList.toggle(`shake`, true);
+        this._disabledBtns(false);
         this._element.querySelector(`button[type=submit]`).textContent = `Save`;
-        this._element.querySelector(`button[type=submit]`).disabled = false;
-        this._element.querySelector(`button[type=reset]`).disabled = false;
+
       });
     }
   }
@@ -154,8 +159,7 @@ class PointEdit extends Component {
     evt.preventDefault();
 
     this._element.classList.toggle(`shake`, false);
-    this._element.querySelector(`button[type=reset]`).disabled = true;
-    this._element.querySelector(`button[type=submit]`).disabled = true;
+    this._disabledBtns(true);
     this._element.querySelector(`button[type=reset]`).textContent = `Deleting...`;
 
     if (isFunction(this._onDelete)) {
@@ -170,9 +174,8 @@ class PointEdit extends Component {
         .catch(() => {
           // console.error(error);
           this._element.classList.toggle(`shake`, true);
+          this._disabledBtns(false);
           this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
-          this._element.querySelector(`button[type=submit]`).disabled = false;
-          this._element.querySelector(`button[type=reset]`).disabled = false;
         });
       }
     }
@@ -203,6 +206,13 @@ class PointEdit extends Component {
 
   _onChangeDestination(evt) {
     this._destination = evt.target.value;
+
+    if (!Destinations[this._destination]) {
+      Destinations[this._destination] = {};
+      Destinations[this._destination].description = ``;
+      Destinations[this._destination].pictures = [];
+    }
+
     const destinationContainer = this._element.querySelector(`.point__destination`);
     destinationContainer.querySelector(`.point__destination-text`).textContent = Destinations[this._destination].description || `No descrition for this destination`;
 

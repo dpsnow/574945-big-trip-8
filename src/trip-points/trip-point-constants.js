@@ -1,6 +1,6 @@
 import {API} from '../api.js';
 
-const AUTHORIZATION = `Basic dXgtyhYsdfHGrjgZAo=0`;
+const AUTHORIZATION = `Basic dXgtyhYsdfjgZAo=0`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
@@ -24,9 +24,7 @@ const MsgStatus = {
   LOADING: `Loading route...`
 };
 
-let Offers = {};
 let Destinations = {};
-// let Destinations = new Map();
 
 let typeTripPoint = {
   'taxi': {
@@ -101,4 +99,4 @@ api.getDestinations()
 // .then(() => console.log('Destinations', Destinations));
 
 
-export {AUTHORIZATION, END_POINT, ESC_KEYCODE, typeTripPoint, Offers, Destinations, TypeStats, TypeInfo, MsgStatus};
+export {AUTHORIZATION, END_POINT, ESC_KEYCODE, typeTripPoint, Destinations, TypeStats, TypeInfo, MsgStatus};

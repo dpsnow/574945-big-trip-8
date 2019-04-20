@@ -17,16 +17,16 @@ const filtersData = [
 
 
 const renderFilters = (filtersContainer) => {
-  const filterElements = [];
+  const filtersElements = [];
 
   filtersData.forEach((data) => {
     const filter = new Filter(data);
     filter.render();
-    filterElements.push(filter.element);
+    filtersElements.push(filter.element);
   });
 
   // console.log(filterElements);
-  renderElements(filtersContainer, filterElements);
+  renderElements(filtersContainer, filtersElements);
 };
 
 export {renderFilters};
