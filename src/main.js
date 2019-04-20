@@ -5,10 +5,11 @@ import {updateGeneralInfo} from './utils/update-general-info.js';
 import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
 import {renderFilters} from './utils/render-filters.js';
+import {showMsg, cleanNode} from './utils/view-utils.js';
 
 import {DayTrip} from "./day-trip/day-trip.js";
 
-import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
+import {AUTHORIZATION, END_POINT, TypeInfo, MsgStatus} from './trip-points/trip-point-constants.js';
 import {TripPointEntity} from './trip-point-entity.js';
 import {Point} from './trip-points/point.js';
 import {PointEdit} from './trip-points/point-edit.js';
@@ -20,6 +21,7 @@ const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
 const filtersContainer = document.querySelector(`.trip-filter`);
 const tripPointsContainer = document.querySelector(`.trip-points`);
+// const boxMsg = document.querySelector(`.box-msg`);
 
 const btnNewEvent = document.querySelector(`.trip-controls__new-event`);
 
@@ -31,7 +33,9 @@ let allDaysTrip = [];
 const renderTripPoints = (entitiesTripPoints) => {
   let oneDayTrip;
   allDaysTrip = [];
-  tripPointsContainer.innerHTML = ``;
+
+  cleanNode(tripPointsContainer);
+  // tripPointsContainer.innerHTML = ``;
   let dayTrip;
 
   // entitiesTripPoints.sort(stateSort);
@@ -98,7 +102,7 @@ const renderTripPoints = (entitiesTripPoints) => {
               // console.log('entitiesTripPoints', entitiesTripPoints);
               renderTripPoints(entitiesTripPoints);
 
-              updateGeneralInfo(entitiesTripPoints.generalInfo, `all`);
+              updateGeneralInfo(entitiesTripPoints.generalInfo);
               edtingMode = null;
             });
       };
@@ -122,7 +126,7 @@ const renderTripPoints = (entitiesTripPoints) => {
       tripPoint.onEdit = () => {
         // console.log(edtingMode);
         if (edtingMode !== null) {
-          edtingMode.closeEditPoint();
+          edtingMode.close();
         }
 
         editTripPoint.update(pointEntity);
@@ -143,7 +147,7 @@ const renderTripPoints = (entitiesTripPoints) => {
               // console.log(' tripPoint.onAddOffer', updatedData);
               entitiesTripPoints.data[i].update(updatedData);
               tripPoint.update(entitiesTripPoints.data[i]);
-              updateGeneralInfo(entitiesTripPoints.generalInfo, `totalPrice`);
+              updateGeneralInfo(entitiesTripPoints.generalInfo, TypeInfo.TOTAL_PRICE);
             });
       };
 
@@ -163,12 +167,14 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 // const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
 // const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
 // console.log(tripPointsEntities);
-tripPointsContainer.innerHTML = `<p style="text-align: center;">Loading route...</p>`;
+showMsg(MsgStatus.LOADING);
+// tripPointsContainer.innerHTML = `<p style="text-align: center;">Loading route...</p>`;
 renderFilters(filtersContainer);
 
 api.getPoints()
   .then((data) => {
     // console.log('getPoints', data);
+    showMsg(``, false);
     const tripPointsEntities = new TripModel(data.map((it) => new TripPointEntity(it)));
 
     // console.log('tripPointsEntities', tripPointsEntities);
@@ -259,6 +265,6 @@ api.getPoints()
     });
   })
   .catch(() => {
-    tripPointsContainer.innerHTML = `<p style="text-align: center;">Something went wrong while loading your route info. Check your connection or try again later</p>`;
+    showMsg(MsgStatus.ERROR);
     // console.error(error);
   });

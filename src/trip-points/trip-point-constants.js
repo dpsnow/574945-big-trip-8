@@ -6,6 +6,24 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const ESC_KEYCODE = 27;
 
+const TypeStats = {
+  DURATION: `duration`,
+  COUNT: `count`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
+const TypeInfo = {
+  CITES: `cites`,
+  TOTAL_PRICE: `totalPrice`,
+  DATES: `dates`
+};
+
+const MsgStatus = {
+  ERROR: `Something went wrong while loading your route info. Check your connection or try again later`,
+  LOADING: `Loading route...`
+};
+
 let Offers = {};
 let Destinations = {};
 // let Destinations = new Map();
@@ -83,4 +101,4 @@ api.getDestinations()
 // .then(() => console.log('Destinations', Destinations));
 
 
-export {AUTHORIZATION, END_POINT, ESC_KEYCODE, typeTripPoint, Offers, Destinations};
+export {AUTHORIZATION, END_POINT, ESC_KEYCODE, typeTripPoint, Offers, Destinations, TypeStats, TypeInfo, MsgStatus};
