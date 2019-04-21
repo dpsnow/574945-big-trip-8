@@ -1,7 +1,7 @@
 import flatpickr from 'flatpickr';
 import moment from 'moment';
 
-import {isFunction, createElement, renderElements} from '../utils/utils.js';
+import {isFunction, cleanNode, createElement, renderElements} from '../utils/utils.js';
 
 import {Component} from '../component.js';
 import {createOffers, getTemplate} from './templates/point-edit-template.js';
@@ -13,8 +13,6 @@ import '../../node_modules/flatpickr/dist/themes/material_green.css';
 
 class PointEdit extends Component {
   constructor(data) {
-    // console.log('from TripPointEdit', data);
-    // console.log('typeTripPoint', typeTripPoint);
     super();
     this._id = data.id;
     this._timeStart = data.timeStart;
@@ -25,13 +23,11 @@ class PointEdit extends Component {
     this._price = data.price;
     this._offers = data.offers;
 
-
     this._flatpickrTo = null;
     this._flatpickrFrom = null;
     this._flatpickrDay = null;
 
     this._icon = data.icon;
-
     this._isNewTripPoint = data.isNewTripPoint;
 
     this._onSubmitBtnClick = this._onSubmitBtnClick.bind(this);
@@ -68,6 +64,15 @@ class PointEdit extends Component {
     this._element.querySelector(`button[type=submit]`).disabled = isDisabled;
   }
 
+  _updateDestination(newValue) {
+    const isNewDestination = !Destinations[newValue] || !Destinations[newValue].description;
+    this._destination = {
+      name: newValue,
+      description: isNewDestination ? `` : Destinations[newValue].description,
+      pictures: isNewDestination ? [] : Destinations[newValue].pictures,
+    };
+  }
+
   _onESCkeydown(evt) {
     if (evt.keyCode === ESC_KEYCODE && isFunction(this._onCancelEditMode)) {
       this._onCancelEditMode();
@@ -84,9 +89,6 @@ class PointEdit extends Component {
 
     for (const pair of formData.entries()) {
       const [property, value] = pair;
-      // console.log('[property, value] = ', pair);
-      // console.log(`newDate[_${property}_] = ${value}`);
-
       if (property === `offer`) {
         this._offers.forEach((offer) => {
           if (offer.title === value) {
@@ -99,25 +101,18 @@ class PointEdit extends Component {
       if (!value) {
         continue;
       }
-
-
       if (convertedData[property]) {
         convertedData[property] = [].concat(convertedData[property]).concat(value);
       } else {
         convertedData[property] = value;
       }
-
     }
-    // console.log('convertedData', convertedData);
+
     return {
       'base_price': convertedData[`price`],
       'date_from': moment(convertedData[`date-start`], `X`).valueOf(),
       'date_to': moment(convertedData[`date-end`], `X`).valueOf(),
-      'destination': {
-        name: convertedData[`destination`],
-        description: Destinations[convertedData[`destination`]].description || ``,
-        pictures: Destinations[convertedData[`destination`]].pictures || []
-      },
+      'destination': this._destination,
       'id': this._id,
       'is_favorite': Boolean(convertedData[`favorite`]),
       'offers': this._offers,
@@ -127,11 +122,8 @@ class PointEdit extends Component {
 
   _onSubmitBtnClick(evt) {
     evt.preventDefault();
-    // this.validateForm();
     const newDate = new FormData(evt.target);
     const updateDate = this._convertDate(newDate);
-    // console.log(updateDate);
-
     this._element.classList.toggle(`shake`, false);
 
     this._disabledBtns(true);
@@ -140,7 +132,6 @@ class PointEdit extends Component {
     if (isFunction(this._onSubmit)) {
       this._onSubmit(updateDate)
       .catch(() => {
-        // console.error(error);
         this._element.classList.toggle(`shake`, true);
         this._disabledBtns(false);
         this._element.querySelector(`button[type=submit]`).textContent = `Save`;
@@ -157,6 +148,7 @@ class PointEdit extends Component {
     this._element.querySelector(`button[type=reset]`).textContent = `Deleting...`;
 
     if (isFunction(this._onDelete)) {
+
       if (this._isNewTripPoint) {
         this.unrender();
         this._onDelete();
@@ -166,7 +158,6 @@ class PointEdit extends Component {
           this.unrender();
         })
         .catch(() => {
-          // console.error(error);
           this._element.classList.toggle(`shake`, true);
           this._disabledBtns(false);
           this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
@@ -181,7 +172,6 @@ class PointEdit extends Component {
     const newOffer = document.createElement(`div`);
     newOffer.classList.add(`point__offers-wrap`);
     this._offers = typeTripPoint[this._type].offers;
-    // console.log(this._offers);
     const offersElements = createElement(createOffers(this._offers, this._id));
     renderElements(newOffer, offersElements);
     offersContainer.replaceChild(newOffer, oldOffers);
@@ -195,28 +185,25 @@ class PointEdit extends Component {
     this._element.querySelector(`.point__destination-label`).textContent = `${typeTripPoint[this._type].text}`;
 
     this._updateOffers();
-
   }
 
   _onChangeDestination(evt) {
-    this._destination = evt.target.value;
-
-    if (!Destinations[this._destination]) {
-      Destinations[this._destination] = {};
-      Destinations[this._destination].description = ``;
-      Destinations[this._destination].pictures = [];
-    }
-
+    this._updateDestination(evt.target.value);
     const destinationContainer = this._element.querySelector(`.point__destination`);
-    destinationContainer.querySelector(`.point__destination-text`).textContent = Destinations[this._destination].description || `No descrition for this destination`;
-
     const oldPictures = destinationContainer.querySelector(`.point__destination-images`);
-    const newPictures = document.createElement(`div`);
-    newPictures.classList.add(`point__destination-images`);
-    const elements = createElement(Destinations[this._destination].pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``));
-    renderElements(newPictures, elements);
 
-    destinationContainer.replaceChild(newPictures, oldPictures);
+    destinationContainer.querySelector(`.point__destination-text`).textContent = this._destination.description || `No descrition for this destination`;
+
+    if (this._destination.pictures.length) {
+      const newPictures = document.createElement(`div`);
+      newPictures.classList.add(`point__destination-images`);
+      const elements = createElement(this._destination.pictures.map((picture) => `<img src="${picture.src}" alt="${picture.description}" class="point__destination-image">`).join(``));
+      renderElements(newPictures, elements);
+      destinationContainer.replaceChild(newPictures, oldPictures);
+    } else {
+      cleanNode(oldPictures);
+      oldPictures.style.display = `none`;
+    }
   }
 
   _initFlatpickr() {
@@ -298,7 +285,6 @@ class PointEdit extends Component {
     document.removeEventListener(`keydown`, this._onESCkeydown);
   }
 
-
   update(newData) {
     this._timeStart = newData.timeStart;
     this._timeEnd = newData.timeEnd;
@@ -307,14 +293,9 @@ class PointEdit extends Component {
     this._isFavorite = newData.isFavorite;
     this._price = newData.price;
     this._offers = newData.offers;
-
     this._icon = newData.icon;
     this._day = newData.day;
-
-    // this._picture = newData.picture;
-    // this._description = newData.description;
   }
-
 }
 
 export {PointEdit};
