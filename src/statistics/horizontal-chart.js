@@ -5,7 +5,6 @@ import moment from 'moment';
 
 class HorizontalChart {
   constructor(container, title, data, prefix) {
-    // console.log('HorizontalChart', data);
     this._container = container;
     this._chart = new Chart(container, {
       plugins: [ChartDataLabels],
@@ -83,9 +82,6 @@ class HorizontalChart {
   }
 
   update(newData) {
-    // console.log('обновление данных для статы', newData);
-    // console.log('this.chart', this.chart);
-    // console.log(`BAR_HEIGHT=${BAR_HEIGHT} * newData.labels.length=${newData.labels.length} = ${BAR_HEIGHT * newData.labels.length}`);
     this.chart.data.labels = newData.labels;
     this.chart.data.datasets[0].data = newData.values;
     this.chart.update({

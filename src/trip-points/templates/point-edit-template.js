@@ -2,7 +2,6 @@ import {formatDate} from '../../utils/utils.js';
 import {CURRENCY, typeTripPoint, Destinations} from '../../trip-constants.js';
 
 const createOffers = (offers, id) => {
-  // console.info(offers);
   if (!offers || !offers.length) {
     return `No avaliable offers`;
   }
@@ -18,8 +17,6 @@ const createOffers = (offers, id) => {
 };
 
 const getTemplate = (point) => {
-  // console.log('from TripPointEdit', point);
-  // console.log('Destinations', Destinations);
   return `
   <article class="point">
   <form action="" method="get">
