@@ -17,13 +17,11 @@ let timeSpendStats;
 
 
 const getDataForStats = (allData, value) => {
-  // console.log(allData);
   const variableForConvert = {};
 
   allData.forEach((it) => {
     if (it.isVisible) {
       let currentValue;
-
       switch (value) {
         case TypeStats.DURATION:
           currentValue = it[value].asMilliseconds();
@@ -57,7 +55,7 @@ const toggleVisibilityStatistics = (value) => {
 };
 
 const initStats = () => {
-  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `${CURRENCY}‚¬ `);
+  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `${CURRENCY}`);
   transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, [], ``);
   timeSpendStats = new HorizontalChart(timeSpendCtx, `TIME SPEND`, [], `time`);
 };

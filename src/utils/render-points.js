@@ -15,12 +15,7 @@ const getPoints = (entitiesTripPoints) => {
   const points = [];
   let dayTrip;
 
-  // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
-
   entitiesTripPoints.data.forEach((pointEntity, i) => {
-    // console.log('pointEntity', pointEntity);
-    // console.log(formatDate(pointEntity.day, `DD MMM`));
-
     if (pointEntity === null || pointEntity.destination === undefined) {
       return;
     }
@@ -35,18 +30,12 @@ const getPoints = (entitiesTripPoints) => {
       dayTrip = currentDay;
     }
 
-    // console.log('oneDayTripPoint', oneDayTripPoint);
-
     if (pointEntity.isVisible) {
-
       const tripPoint = new Point(pointEntity);
       const editTripPoint = new PointEdit(pointEntity);
 
       points.push(oneDayTrip.element);
-
       oneDayItems = oneDayTrip.containerForPoints;
-
-
       editTripPoint.onCancelEditMode = () => {
         tripPoint.render();
         oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
@@ -55,26 +44,19 @@ const getPoints = (entitiesTripPoints) => {
       };
 
       editTripPoint.onSubmit = (newData) => {
-        // console.log(`updateDate [${i}]`, updateDate);
         return entitiesTripPoints.update(newData)
           .then((updatedData) => {
             entitiesTripPoints.data[i].update(updatedData);
-
             tripPoint.update(entitiesTripPoints.data[i]);
-            // console.log('entitiesTripPoints', entitiesTripPoints);
             renderPoints(entitiesTripPoints);
-
             updateGeneralInfo(entitiesTripPoints.generalInfo);
             edtingMode = null;
           });
       };
 
       editTripPoint.onDelete = () => {
-        // console.log(`onDelete [${i}]`, entitiesTripPoints.data[i]);
-
         return entitiesTripPoints.delete(entitiesTripPoints.data[i].id)
           .then(() => {
-            // console.log(' entitiesTripPoints.update', updatedData);
             delete entitiesTripPoints.data[i];
             updateGeneralInfo(entitiesTripPoints.generalInfo);
             renderPoints(entitiesTripPoints);
@@ -83,26 +65,19 @@ const getPoints = (entitiesTripPoints) => {
       };
 
       tripPoint.onEdit = () => {
-        // console.log(edtingMode);
         if (edtingMode !== null) {
           edtingMode.close();
         }
-
         editTripPoint.update(pointEntity);
         editTripPoint.render();
         oneDayItems.replaceChild(editTripPoint.element, tripPoint.element);
         edtingMode = editTripPoint;
         tripPoint.unrender();
-
-        // isEditMode = true;
       };
 
       tripPoint.onAddOffer = () => {
-        // console.log(`updateDate [${i}]`);
-
         return entitiesTripPoints.update(tripPoint.toRaw)
           .then((updatedData) => {
-            // console.log(' tripPoint.onAddOffer', updatedData);
             entitiesTripPoints.data[i].update(updatedData);
             tripPoint.update(entitiesTripPoints.data[i]);
             updateGeneralInfo(entitiesTripPoints.generalInfo, TypeInfo.TOTAL_PRICE);
@@ -112,9 +87,6 @@ const getPoints = (entitiesTripPoints) => {
       oneDayItems.appendChild(tripPoint.render());
     }
   });
-
-  // console.log('daysTrip', daysTrip);
-
   return points;
 };
 

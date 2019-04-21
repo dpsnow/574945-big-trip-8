@@ -1,5 +1,4 @@
 export const getTemplate = (filterParam) => {
-  // console.log('from Filter', filterParam);
   return `
   <span>
     <input

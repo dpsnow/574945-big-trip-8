@@ -17,7 +17,6 @@ const showMsg = (msg, node, state = true) => {
   node.textContent = msg;
 };
 
-
 /**
  * Переобразовывает HTML код элемента в DOM узлы
  *
@@ -25,9 +24,7 @@ const showMsg = (msg, node, state = true) => {
  * @return {NodeList} - список DOM-элемент
  */
 const createElement = (html) => {
-  // console.log(html);
   const element = parser.parseFromString(html, `text/html`);
-  // console.log(`createElement childNodes`, element.body.childNodes);
   return element.body.childNodes;
 };
 
@@ -40,9 +37,7 @@ const createElement = (html) => {
  */
 const renderElements = (container, elements) => {
   const fragment = document.createDocumentFragment();
-  // console.log(elements);
   [...elements].forEach((element) => {
-    // console.log(element);
     fragment.appendChild(element);
   });
   container.appendChild(fragment);
@@ -50,7 +45,6 @@ const renderElements = (container, elements) => {
 
 
 const formatDate = (date, format) => {
-  // console.log(`formatDate:, date = ${date} typeof ${typeof date},  format = ${format}  typeof ${typeof format}`);
   return moment(date, `x`).isValid() ? moment(date, `x`).format(format) : ``;
 };
 

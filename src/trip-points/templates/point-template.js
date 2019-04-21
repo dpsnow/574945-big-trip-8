@@ -6,7 +6,6 @@ const unacceptedOffers = (offers) => {
 };
 
 export const getTemplate = (point) => {
-  // console.log('from TripPoint', point);
   return `
   <article class="trip-point">
     <i class="trip-icon">${point._icon}</i>
