@@ -693,6 +693,10 @@ input[type=radio]:checked + .trip-sorting__item {
   max-width: 935px;
 }
 
+.trip-point__price {
+  flex-basis: 85px;
+}
+
 .trip__points {
   margin-right: 30px;
   margin-bottom: 20px;

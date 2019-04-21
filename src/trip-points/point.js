@@ -10,7 +10,7 @@ class Point extends Component {
     this._timeStart = data.timeStart;
     this._timeEnd = data.timeEnd;
     this._type = data.type;
-    this._destination = data.destination.name;
+    this._destination = data.destination;
     this._isFavorite = data.isFavorite;
     this._price = data.price;
     this._totalPrice = data.totalPrice;
@@ -51,11 +51,7 @@ class Point extends Component {
       'base_price': this._price,
       'date_from': this._timeStart,
       'date_to': this._timeEnd,
-      'destination': {
-        name: this._destination,
-        description: Destinations[this._destination].description,
-        pictures: Destinations[this._destination].pictures
-      },
+      'destination': this._destination,
       'id': this._id,
       'is_favorite': this._isFavorite,
       'offers': this._offers,
@@ -114,7 +110,7 @@ class Point extends Component {
   update(newData) {
     this._icon = newData.icon;
     this._type = newData.type;
-    this._destination = newData.destination.name;
+    this._destination = newData.destination;
     this._timeStart = newData.timeStart;
     this._timeEnd = newData.timeEnd;
     this._price = newData.price;

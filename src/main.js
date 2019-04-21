@@ -71,8 +71,8 @@ api.getPoints()
   });
 
   btnNewEvent.addEventListener(`click`, (evt) => {
-    const editTripPointNew = new PointEdit(newPointEntity);
     const newPointEntity = new PointEntity(tripPointsEntities.dataForNewTripPoint);
+    const editTripPointNew = new PointEdit(newPointEntity);
     tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
     evt.target.disabled = true;
 

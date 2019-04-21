@@ -9,7 +9,7 @@ export const getTemplate = (point) => {
   return `
   <article class="trip-point">
     <i class="trip-icon">${point._icon}</i>
-    <h3 class="trip-point__title">${typeTripPoint[point._type].text} ${point._destination}</h3>
+    <h3 class="trip-point__title">${typeTripPoint[point._type].text} ${point._destination.name}</h3>
     <p class="trip-point__schedule">
       <span class="trip-point__timetable">${point.times}</span>
       <span class="trip-point__duration">${point.duration}</span>
