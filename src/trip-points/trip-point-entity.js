@@ -1,8 +1,7 @@
 import moment from 'moment';
-// import {formatDate} from '../utils.js';
-import {typeTripPoint} from './trip-points/trip-point-constants.js';
+import {typeTripPoint} from '../trip-constants.js';
 
-class TripPointEntity {
+class PointEntity {
   constructor(data) {
     // console.log(`in TripPointEntity`, data);
     this._isVisible = true;
@@ -40,9 +39,6 @@ class TripPointEntity {
     const currentDay = moment(this.timeStart);
     // console.log(`-----------------------------`);
     // console.log(`this.timeStart = ${moment(this.timeStart).date()}; startDate = ${moment(startDate).date()};`);
-    // return moment(this.timeStart).diff(startDate, `days`);
-
-    // return moment(this.timeStart).date() - moment(startDate).date() + 1;
     // console.log(currentDay.diff(startDay, `days`));
     return currentDay.diff(startDay, `days`) + 1;
   }
@@ -71,4 +67,4 @@ class TripPointEntity {
   }
 }
 
-export {TripPointEntity};
+export {PointEntity};

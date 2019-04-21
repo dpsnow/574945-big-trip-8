@@ -4,9 +4,9 @@ import moment from 'moment';
 import {isFunction, createElement, renderElements} from '../utils/utils.js';
 
 import {Component} from '../component.js';
-import {getTemplate} from './templates/point-edit-template.js';
+import {createOffers, getTemplate} from './templates/point-edit-template.js';
 
-import {ESC_KEYCODE, typeTripPoint, Destinations} from './trip-point-constants.js';
+import {ESC_KEYCODE, typeTripPoint, Destinations} from '../trip-constants.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_green.css';
@@ -31,12 +31,6 @@ class PointEdit extends Component {
     this._flatpickrDay = null;
 
     this._icon = data.icon;
-
-    // this._day = data.day;
-
-    // this._allOffers = data.allOffers;
-    // this._description = data.description;
-    // this._picture = data.picture;
 
     this._isNewTripPoint = data.isNewTripPoint;
 
@@ -63,15 +57,19 @@ class PointEdit extends Component {
     this._onCancelEditMode = fn;
   }
 
-  closeEditPoint() {
+  close() {
     if (isFunction(this._onCancelEditMode)) {
       this._onCancelEditMode();
     }
   }
 
+  _disabledBtns(isDisabled) {
+    this._element.querySelector(`button[type=reset]`).disabled = isDisabled;
+    this._element.querySelector(`button[type=submit]`).disabled = isDisabled;
+  }
+
   _onESCkeydown(evt) {
     if (evt.keyCode === ESC_KEYCODE && isFunction(this._onCancelEditMode)) {
-    // if (evt.keyCode === ESC_KEYCODE) {
       this._onCancelEditMode();
     }
   }
@@ -135,8 +133,8 @@ class PointEdit extends Component {
     // console.log(updateDate);
 
     this._element.classList.toggle(`shake`, false);
-    this._element.querySelector(`button[type=reset]`).disabled = true;
-    this._element.querySelector(`button[type=submit]`).disabled = true;
+
+    this._disabledBtns(true);
     this._element.querySelector(`button[type=submit]`).textContent = `Saving....`;
 
     if (isFunction(this._onSubmit)) {
@@ -144,9 +142,9 @@ class PointEdit extends Component {
       .catch(() => {
         // console.error(error);
         this._element.classList.toggle(`shake`, true);
+        this._disabledBtns(false);
         this._element.querySelector(`button[type=submit]`).textContent = `Save`;
-        this._element.querySelector(`button[type=submit]`).disabled = false;
-        this._element.querySelector(`button[type=reset]`).disabled = false;
+
       });
     }
   }
@@ -155,8 +153,7 @@ class PointEdit extends Component {
     evt.preventDefault();
 
     this._element.classList.toggle(`shake`, false);
-    this._element.querySelector(`button[type=reset]`).disabled = true;
-    this._element.querySelector(`button[type=submit]`).disabled = true;
+    this._disabledBtns(true);
     this._element.querySelector(`button[type=reset]`).textContent = `Deleting...`;
 
     if (isFunction(this._onDelete)) {
@@ -171,9 +168,8 @@ class PointEdit extends Component {
         .catch(() => {
           // console.error(error);
           this._element.classList.toggle(`shake`, true);
+          this._disabledBtns(false);
           this._element.querySelector(`button[type=reset]`).textContent = `Delete`;
-          this._element.querySelector(`button[type=submit]`).disabled = false;
-          this._element.querySelector(`button[type=reset]`).disabled = false;
         });
       }
     }
@@ -186,19 +182,8 @@ class PointEdit extends Component {
     newOffer.classList.add(`point__offers-wrap`);
     this._offers = typeTripPoint[this._type].offers;
     // console.log(this._offers);
-    if (!this._offers || this._offers.length === 0) {
-      newOffer.textContent = `No avaliable offers`;
-
-    } else {
-      const offersElements = createElement(this._offers.map((offer, index) => `<input class="point__offers-input visually-hidden" type="checkbox" id="${index}" name="offer" value="${offer.title}"
-      ${offer.accepted ? `checked` : ``}>
-      <label for="${index}" class="point__offers-label">
-        <span class="point__offer-service">${offer.title}</span> + €<span class="point__offer-price">${offer.price}</span>
-      </label>`)
-      .join(``));
-      renderElements(newOffer, offersElements);
-    }
-
+    const offersElements = createElement(createOffers(this._offers, this._id));
+    renderElements(newOffer, offersElements);
     offersContainer.replaceChild(newOffer, oldOffers);
   }
 
@@ -215,6 +200,13 @@ class PointEdit extends Component {
 
   _onChangeDestination(evt) {
     this._destination = evt.target.value;
+
+    if (!Destinations[this._destination]) {
+      Destinations[this._destination] = {};
+      Destinations[this._destination].description = ``;
+      Destinations[this._destination].pictures = [];
+    }
+
     const destinationContainer = this._element.querySelector(`.point__destination`);
     destinationContainer.querySelector(`.point__destination-text`).textContent = Destinations[this._destination].description || `No descrition for this destination`;
 

@@ -1,5 +1,5 @@
 import {HorizontalChart} from './horizontal-chart.js';
-import {typeTripPoint} from '../trip-points/trip-point-constants.js';
+import {CURRENCY, typeTripPoint, TypeStats} from '../trip-constants.js';
 
 const moneyCtx = document.querySelector(`.statistic__money`);
 const transportCtx = document.querySelector(`.statistic__transport`);
@@ -16,20 +16,30 @@ let transportStats;
 let timeSpendStats;
 
 
-const getDataForStats = (allData, value = `count`) => {
+const getDataForStats = (allData, value) => {
   // console.log(allData);
   const variableForConvert = {};
 
   allData.forEach((it) => {
     if (it.isVisible) {
-      if (value === `duration`) {
-        variableForConvert[it.type] = (variableForConvert[it.type] || 0) + it[value].asMilliseconds();
-      } else {
-        variableForConvert[it.type] = (variableForConvert[it.type] || 0) + (value === `count` ? 1 : it[value]);
+      let currentValue;
+
+      switch (value) {
+        case TypeStats.DURATION:
+          currentValue = it[value].asMilliseconds();
+          break;
+
+        case TypeStats.COUNT:
+          currentValue = 1;
+          break;
+
+        default:
+          currentValue = it[value];
+          break;
       }
+      variableForConvert[it.type] = (variableForConvert[it.type] || 0) + currentValue;
     }
   });
-
 
   return {
     labels: Object.keys(variableForConvert).map((el) => `${typeTripPoint[el].icon} ${el.toUpperCase()}`),
@@ -38,7 +48,6 @@ const getDataForStats = (allData, value = `count`) => {
 };
 
 const toggleVisibilityStatistics = (value) => {
-  // viewStatistics = value;
   linkViewStatistics.classList.toggle(`view-switch__item--active`, value);
   statsContainer.classList.toggle(`visually-hidden`, !value);
 
@@ -48,18 +57,15 @@ const toggleVisibilityStatistics = (value) => {
 };
 
 const initStats = () => {
-  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `â‚¬ `);
+  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `${CURRENCY}‚¬ `);
   transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, [], ``);
   timeSpendStats = new HorizontalChart(timeSpendCtx, `TIME SPEND`, [], `time`);
 };
 
 const updateStats = (allData) => {
-  moneyStats.update(getDataForStats(allData, `price`));
-  transportStats.update(getDataForStats(allData));
-  timeSpendStats.update(getDataForStats(allData, `duration`));
-
-  // moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, getDataForStats(allData, `price`), `â‚¬ `);
-  // transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);
+  moneyStats.update(getDataForStats(allData, TypeStats.PRICE));
+  transportStats.update(getDataForStats(allData, TypeStats.COUNT));
+  timeSpendStats.update(getDataForStats(allData, TypeStats.DURATION));
 };
 
 export {toggleVisibilityStatistics, initStats, updateStats};

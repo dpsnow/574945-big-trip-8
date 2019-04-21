@@ -1,20 +1,23 @@
 import {formatDate} from '../../utils/utils.js';
-import {typeTripPoint, Destinations} from '../trip-point-constants.js';
+import {CURRENCY, typeTripPoint, Destinations} from '../../trip-constants.js';
 
-export const renderAllOffers = (point) => {
-  // const currentArrayOffers = point._offers || typeTripPoint[point._type].offers;
-  return point._offers.map((offer, index) => {
+const createOffers = (offers, id) => {
+  // console.info(offers);
+  if (!offers || !offers.length) {
+    return `No avaliable offers`;
+  }
+  return offers.map((offer, index) => {
     return `
-    <input class="point__offers-input visually-hidden" type="checkbox" id="${point._id}-${index}" name="offer" value="${offer.title}"
+    <input class="point__offers-input visually-hidden" type="checkbox" id="${id}-${index}" name="offer" value="${offer.title}"
     ${offer.accepted ? `checked` : ``}>
-    <label for="${point._id}-${index}" class="point__offers-label">
-      <span class="point__offer-service">${offer.title || offer.name}</span> + €<span class="point__offer-price">${offer.price}</span>
+    <label for="${id}-${index}" class="point__offers-label">
+      <span class="point__offer-service">${offer.title || offer.name}</span> + ${CURRENCY}<span class="point__offer-price">${offer.price}</span>
     </label>
     `;
   }).join(``);
 };
 
-export const getTemplate = (point) => {
+const getTemplate = (point) => {
   // console.log('from TripPointEdit', point);
   // console.log('Destinations', Destinations);
   return `
@@ -55,7 +58,7 @@ export const getTemplate = (point) => {
 
       <label class="point__price">
         write price
-        <span class="point__price-currency">€</span>
+        <span class="point__price-currency">${CURRENCY}</span>
         <input class="point__input" type="text" value="${point._price}" name="price">
       </label>
 
@@ -74,7 +77,7 @@ export const getTemplate = (point) => {
       <section class="point__offers">
         <h3 class="point__details-title">offers</h3>
 
-        <div class="point__offers-wrap">${point._offers ? renderAllOffers(point) : `No avaliable offers`}
+        <div class="point__offers-wrap">${createOffers(point._offers, point._id)}
         </div>
 
       </section>
@@ -92,3 +95,4 @@ export const getTemplate = (point) => {
 </article>`.trim();
 };
 
+export {createOffers, getTemplate};
