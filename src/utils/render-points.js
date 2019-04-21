@@ -7,16 +7,12 @@ import {TypeInfo} from '../trip-constants.js';
 import {formatDate, renderElements, cleanNode} from './utils.js';
 import {updateGeneralInfo} from './update-general-info.js';
 
-
 const tripPointsContainer = document.querySelector(`.trip-points`);
-
 
 const getPoints = (entitiesTripPoints) => {
   let oneDayTrip;
   let edtingMode = null;
-
   const points = [];
-
   let dayTrip;
 
   // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
@@ -61,29 +57,29 @@ const getPoints = (entitiesTripPoints) => {
       editTripPoint.onSubmit = (newData) => {
         // console.log(`updateDate [${i}]`, updateDate);
         return entitiesTripPoints.update(newData)
-            .then((updatedData) => {
-              entitiesTripPoints.data[i].update(updatedData);
+          .then((updatedData) => {
+            entitiesTripPoints.data[i].update(updatedData);
 
-              tripPoint.update(entitiesTripPoints.data[i]);
-              // console.log('entitiesTripPoints', entitiesTripPoints);
-              renderPoints(entitiesTripPoints);
+            tripPoint.update(entitiesTripPoints.data[i]);
+            // console.log('entitiesTripPoints', entitiesTripPoints);
+            renderPoints(entitiesTripPoints);
 
-              updateGeneralInfo(entitiesTripPoints.generalInfo);
-              edtingMode = null;
-            });
+            updateGeneralInfo(entitiesTripPoints.generalInfo);
+            edtingMode = null;
+          });
       };
 
       editTripPoint.onDelete = () => {
         // console.log(`onDelete [${i}]`, entitiesTripPoints.data[i]);
 
         return entitiesTripPoints.delete(entitiesTripPoints.data[i].id)
-            .then(() => {
-              // console.log(' entitiesTripPoints.update', updatedData);
-              delete entitiesTripPoints.data[i];
-              updateGeneralInfo(entitiesTripPoints.generalInfo);
-              renderPoints(entitiesTripPoints);
-              edtingMode = null;
-            });
+          .then(() => {
+            // console.log(' entitiesTripPoints.update', updatedData);
+            delete entitiesTripPoints.data[i];
+            updateGeneralInfo(entitiesTripPoints.generalInfo);
+            renderPoints(entitiesTripPoints);
+            edtingMode = null;
+          });
       };
 
       tripPoint.onEdit = () => {
@@ -105,12 +101,12 @@ const getPoints = (entitiesTripPoints) => {
         // console.log(`updateDate [${i}]`);
 
         return entitiesTripPoints.update(tripPoint.toRaw)
-            .then((updatedData) => {
-              // console.log(' tripPoint.onAddOffer', updatedData);
-              entitiesTripPoints.data[i].update(updatedData);
-              tripPoint.update(entitiesTripPoints.data[i]);
-              updateGeneralInfo(entitiesTripPoints.generalInfo, TypeInfo.TOTAL_PRICE);
-            });
+          .then((updatedData) => {
+            // console.log(' tripPoint.onAddOffer', updatedData);
+            entitiesTripPoints.data[i].update(updatedData);
+            tripPoint.update(entitiesTripPoints.data[i]);
+            updateGeneralInfo(entitiesTripPoints.generalInfo, TypeInfo.TOTAL_PRICE);
+          });
       };
 
       oneDayItems.appendChild(tripPoint.render());

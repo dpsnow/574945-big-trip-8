@@ -1,8 +1,8 @@
-import {typeTripPoint} from '../../trip-constants.js';
+import {CURRENCY, typeTripPoint} from '../../trip-constants.js';
 
 const unacceptedOffers = (offers) => {
   const filteredOffer = offers.filter((offer) => !offer.accepted).slice(0, 3);
-  return filteredOffer.map((offer) => !offer.accepted ? `<li><button class="trip-point__offer">${offer.title} + €${offer.price}</button></li>` : ``).join(``);
+  return filteredOffer.map((offer) => !offer.accepted ? `<li><button class="trip-point__offer">${offer.title} + ${CURRENCY}${offer.price}</button></li>` : ``).join(``);
 };
 
 export const getTemplate = (point) => {

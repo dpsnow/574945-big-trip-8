@@ -1,29 +1,27 @@
 import {API} from './api.js';
 
-import {updateGeneralInfo} from './utils/update-general-info.js';
-
 import {showMsg} from './utils/utils.js';
 import {renderFilters} from './utils/render-filters.js';
 import {renderPoints} from './utils/render-points.js';
+import {updateGeneralInfo} from './utils/update-general-info.js';
 
 import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
 import {AUTHORIZATION, END_POINT, MsgStatus} from './trip-constants.js';
-
-import {TripModel} from "./trip-model";
-
 import {PointEntity} from './trip-points/trip-point-entity.js';
 import {PointEdit} from './trip-points/point-edit.js';
+import {TripModel} from "./trip-model";
+
+
+const boxMsg = document.querySelector(`.box-msg`);
 
 const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
 const linkViewTable = document.querySelector(`.view-switch a[href*=table]`);
 
 const filtersContainer = document.querySelector(`.trip-filter`);
+const btnNewEvent = document.querySelector(`.trip-controls__new-event`);
 const tripPointsContainer = document.querySelector(`.trip-points`);
 
-const boxMsg = document.querySelector(`.box-msg`);
-
-const btnNewEvent = document.querySelector(`.trip-controls__new-event`);
 
 let viewStatistics = false;
 

@@ -1,5 +1,5 @@
 import {formatDate} from '../../utils/utils.js';
-import {typeTripPoint, Destinations} from '../../trip-constants.js';
+import {CURRENCY, typeTripPoint, Destinations} from '../../trip-constants.js';
 
 const createOffers = (offers, id) => {
   // console.info(offers);
@@ -11,7 +11,7 @@ const createOffers = (offers, id) => {
     <input class="point__offers-input visually-hidden" type="checkbox" id="${id}-${index}" name="offer" value="${offer.title}"
     ${offer.accepted ? `checked` : ``}>
     <label for="${id}-${index}" class="point__offers-label">
-      <span class="point__offer-service">${offer.title || offer.name}</span> + €<span class="point__offer-price">${offer.price}</span>
+      <span class="point__offer-service">${offer.title || offer.name}</span> + ${CURRENCY}<span class="point__offer-price">${offer.price}</span>
     </label>
     `;
   }).join(``);
@@ -58,7 +58,7 @@ const getTemplate = (point) => {
 
       <label class="point__price">
         write price
-        <span class="point__price-currency">€</span>
+        <span class="point__price-currency">${CURRENCY}</span>
         <input class="point__input" type="text" value="${point._price}" name="price">
       </label>
 

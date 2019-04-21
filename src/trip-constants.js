@@ -6,6 +6,8 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const ESC_KEYCODE = 27;
 
+const CURRENCY = `€`;
+
 const NameFilter = {
   EVERYTHING: `Everything`,
   FUTURE: `Future`,
@@ -106,4 +108,4 @@ api.getDestinations()
 // .then(() => console.log('Destinations', Destinations));
 
 
-export {AUTHORIZATION, END_POINT, ESC_KEYCODE, NameFilter, filtersData, typeTripPoint, Destinations, TypeStats, TypeSort, TypeInfo, MsgStatus};
+export {AUTHORIZATION, END_POINT, ESC_KEYCODE, CURRENCY, NameFilter, filtersData, typeTripPoint, Destinations, TypeStats, TypeSort, TypeInfo, MsgStatus};

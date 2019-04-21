@@ -1,7 +1,7 @@
 import {isFunction, formatDate} from '../utils/utils.js';
 import {Component} from '../component.js';
 import {getTemplate} from './templates/point-template.js';
-import {Destinations} from '../trip-constants.js';
+import {CURRENCY, Destinations} from '../trip-constants.js';
 
 class Point extends Component {
   constructor(data) {
@@ -82,7 +82,7 @@ class Point extends Component {
     this._element.classList.toggle(`shake`, false);
 
     let targetOffer = evt.target.innerText;
-    targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + €`));
+    targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + ${CURRENCY}`));
 
     this._offers.forEach((offer) => {
       if (offer.title === targetOffer) {
@@ -94,7 +94,7 @@ class Point extends Component {
     if (isFunction(this._onAddOffer)) {
       this._onAddOffer(evt.target)
         .then(() => {
-          this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
+          this.element.querySelector(`.trip-point__price`).textContent = `${CURRENCY} ${this._totalPrice}`;
           evt.target.remove();
         })
         .catch(() => {
@@ -117,7 +117,7 @@ class Point extends Component {
   }
 
   updateTotalPrice() {
-    this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
+    this.element.querySelector(`.trip-point__price`).textContent = `${CURRENCY} ${this._totalPrice}`;
   }
 
   update(newData) {

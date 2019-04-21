@@ -1,5 +1,5 @@
 import {HorizontalChart} from './horizontal-chart.js';
-import {typeTripPoint, TypeStats} from '../trip-constants.js';
+import {CURRENCY, typeTripPoint, TypeStats} from '../trip-constants.js';
 
 const moneyCtx = document.querySelector(`.statistic__money`);
 const transportCtx = document.querySelector(`.statistic__transport`);
@@ -57,7 +57,7 @@ const toggleVisibilityStatistics = (value) => {
 };
 
 const initStats = () => {
-  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `â‚¬ `);
+  moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, [], `${CURRENCY}‚¬ `);
   transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, [], ``);
   timeSpendStats = new HorizontalChart(timeSpendCtx, `TIME SPEND`, [], `time`);
 };

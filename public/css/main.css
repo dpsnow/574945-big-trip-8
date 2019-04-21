@@ -694,8 +694,8 @@ input[type=radio]:checked + .trip-sorting__item {
   margin-bottom: 20px;
 }
 
-.trip-point__offers { width: auto;
-  max-width: 285px;
+.trip-point__offers {
+  width: auto;
 }
 
 button.trip-controls__new-event:disabled {
