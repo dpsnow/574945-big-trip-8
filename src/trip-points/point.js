@@ -1,7 +1,7 @@
 import {isFunction, formatDate} from '../utils/utils.js';
 import {Component} from '../component.js';
 import {getTemplate} from './templates/point-template.js';
-import {CURRENCY, Destinations} from '../trip-constants.js';
+import {CURRENCY} from '../trip-constants.js';
 
 class Point extends Component {
   constructor(data) {
