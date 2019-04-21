@@ -3,13 +3,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import moment from 'moment';
 
-// const moneyCtx = document.querySelector(`.statistic__money`);
-// const transportCtx = document.querySelector(`.statistic__transport`);
-// const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
-
-// Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
-// const BAR_HEIGHT = 55;
-
 class HorizontalChart {
   constructor(container, title, data, prefix) {
     // console.log('HorizontalChart', data);
@@ -95,7 +88,6 @@ class HorizontalChart {
     // console.log(`BAR_HEIGHT=${BAR_HEIGHT} * newData.labels.length=${newData.labels.length} = ${BAR_HEIGHT * newData.labels.length}`);
     this.chart.data.labels = newData.labels;
     this.chart.data.datasets[0].data = newData.values;
-    // this._container.height = BAR_HEIGHT * newData.labels.length;
     this.chart.update({
       duration: 800,
       easing: `easeOutQuart`

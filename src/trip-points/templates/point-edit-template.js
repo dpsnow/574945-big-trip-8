@@ -1,5 +1,5 @@
 import {formatDate} from '../../utils/utils.js';
-import {typeTripPoint, Destinations} from '../trip-point-constants.js';
+import {typeTripPoint, Destinations} from '../../trip-constants.js';
 
 const createOffers = (offers, id) => {
   // console.info(offers);

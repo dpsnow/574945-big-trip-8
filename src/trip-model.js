@@ -1,16 +1,14 @@
 import {API} from './api.js';
-import {AUTHORIZATION, END_POINT} from './trip-points/trip-point-constants.js';
+import {AUTHORIZATION, END_POINT, NameFilter, TypeSort} from './trip-constants.js';
 import moment from 'moment';
-
-// import {formatDate} from './utils.js';
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 class TripModel {
   constructor(data) {
     this._data = data;
-    this._currentFilter = `Everything`;
-    this._currentSort = `day`;
+    this._currentFilter = NameFilter.EVERYTHING;
+    this._currentSort = TypeSort.DAY;
   }
 
   get data() {
@@ -18,10 +16,6 @@ class TripModel {
     this.sort(this._currentSort);
     return this._data;
   }
-
-  // getById(id) {
-  //   return api.getPoint(id);
-  // }
 
   add(task) {
     return api.createTask(task);
@@ -47,11 +41,10 @@ class TripModel {
   }
 
   filter(value) {
-    // this._data = this._data.map((it) => Boolean(it));
     this._currentFilter = value;
 
     switch (value) {
-      case `Future`:
+      case NameFilter.FUTURE:
         return this._data.forEach((point) => {
           if (point === null) {
             return;
@@ -61,7 +54,7 @@ class TripModel {
           // point.isVisible = point.price >= 1000;
         });
 
-      case `Past`:
+      case NameFilter.PAST:
         return this._data.forEach((point) => {
           if (point === null) {
             return;
@@ -86,13 +79,13 @@ class TripModel {
     this._currentSort = value;
 
     switch (value) {
-      case `event`:
+      case TypeSort.EVENT:
         return this._data.sort((a, b) => (a.type < b.type) ? -1 : 1);
 
-      case `time`:
+      case TypeSort.TIME:
         return this._data.sort((a, b) => b.duration.valueOf() - a.duration.valueOf());
 
-      case `price`:
+      case TypeSort.PRICE:
         return this._data.sort((a, b) => b.totalPrice - a.totalPrice);
 
       default:

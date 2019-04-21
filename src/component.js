@@ -1,6 +1,5 @@
 import {createElement} from './utils/utils.js';
 
-
 class Component {
   constructor() {
     if (new.target === Component) {

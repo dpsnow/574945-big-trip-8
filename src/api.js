@@ -39,11 +39,6 @@ const API = class {
       .then(toJSON);
   }
 
-  // getPoint(id) {
-  //   return this._load({url: `points/${id}`})
-  //     .then(toJSON);
-  // }
-
   getDestinations() {
     return this._load({url: `destinations`})
       .then(toJSON);

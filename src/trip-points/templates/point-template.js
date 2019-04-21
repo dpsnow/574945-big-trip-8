@@ -1,4 +1,4 @@
-import {typeTripPoint} from '../trip-point-constants.js';
+import {typeTripPoint} from '../../trip-constants.js';
 
 const unacceptedOffers = (offers) => {
   const filteredOffer = offers.filter((offer) => !offer.accepted).slice(0, 3);

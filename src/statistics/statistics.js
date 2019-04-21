@@ -1,5 +1,5 @@
 import {HorizontalChart} from './horizontal-chart.js';
-import {typeTripPoint, TypeStats} from '../trip-points/trip-point-constants.js';
+import {typeTripPoint, TypeStats} from '../trip-constants.js';
 
 const moneyCtx = document.querySelector(`.statistic__money`);
 const transportCtx = document.querySelector(`.statistic__transport`);
@@ -48,7 +48,6 @@ const getDataForStats = (allData, value) => {
 };
 
 const toggleVisibilityStatistics = (value) => {
-  // viewStatistics = value;
   linkViewStatistics.classList.toggle(`view-switch__item--active`, value);
   statsContainer.classList.toggle(`visually-hidden`, !value);
 
@@ -67,9 +66,6 @@ const updateStats = (allData) => {
   moneyStats.update(getDataForStats(allData, TypeStats.PRICE));
   transportStats.update(getDataForStats(allData, TypeStats.COUNT));
   timeSpendStats.update(getDataForStats(allData, TypeStats.DURATION));
-
-  // moneyStats = new HorizontalChart(moneyCtx, `MY MONEY`, getDataForStats(allData, `price`), `€ `);
-  // transportStats = new HorizontalChart(transportCtx, `TRANSPORT`, getDataForStats(allData), ``);
 };
 
 export {toggleVisibilityStatistics, initStats, updateStats};

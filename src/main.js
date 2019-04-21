@@ -8,11 +8,11 @@ import {renderPoints} from './utils/render-points.js';
 
 import {initStats, updateStats, toggleVisibilityStatistics} from './statistics/statistics.js';
 
-import {AUTHORIZATION, END_POINT, MsgStatus} from './trip-points/trip-point-constants.js';
+import {AUTHORIZATION, END_POINT, MsgStatus} from './trip-constants.js';
 
 import {TripModel} from "./trip-model";
 
-import {TripPointEntity} from './trip-point-entity.js';
+import {PointEntity} from './trip-points/trip-point-entity.js';
 import {PointEdit} from './trip-points/point-edit.js';
 
 const linkViewStatistics = document.querySelector(`.view-switch a[href*=stats]`);
@@ -29,18 +29,15 @@ let viewStatistics = false;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-// const inputDataForTripPoints = getTripPointsData(NUMBER_TRIP_POINTS_ON_PAGE);
-// const tripPointsEntities = inputDataForTripPoints.map((data) => new TripPointEntity(data));
 // console.log(tripPointsEntities);
 showMsg(MsgStatus.LOADING, boxMsg);
-// tripPointsContainer.innerHTML = `<p style="text-align: center;">Loading route...</p>`;
 renderFilters(filtersContainer);
 
 api.getPoints()
 .then((data) => {
   // console.log('getPoints', data);
   showMsg(``, boxMsg, false);
-  const tripPointsEntities = new TripModel(data.map((it) => new TripPointEntity(it)));
+  const tripPointsEntities = new TripModel(data.map((it) => new PointEntity(it)));
 
   // console.log('tripPointsEntities', tripPointsEntities);
   // console.log('tripPointsEntities', tripPointsEntities);
@@ -59,11 +56,6 @@ api.getPoints()
   document.querySelector(`.trip-sorting`).addEventListener(`change`, (evt) => {
     // console.log('Сортировка по ', evt.target.value);
     tripPointsEntities.sort(evt.target.value);
-    // stateSort = evt.target.value;
-    // renderTripPoints(tripPointsEntities);
-
-    // renderPoints(tripPointsContainer, tripPointsEntities);
-
     renderPoints(tripPointsEntities);
   });
 
@@ -74,7 +66,6 @@ api.getPoints()
     if (viewStatistics) {
       updateStats(tripPointsEntities.data);
     } else {
-      // renderTripPoints(tripPointsEntities);
       renderPoints(tripPointsEntities);
     }
   });
@@ -93,7 +84,6 @@ api.getPoints()
     evt.preventDefault();
     if (viewStatistics) {
       viewStatistics = toggleVisibilityStatistics(false);
-      // renderTripPoints(tripPointsEntities);
       renderPoints(tripPointsEntities, tripPointsContainer);
     }
   });
@@ -102,11 +92,8 @@ api.getPoints()
   btnNewEvent.addEventListener(`click`, (evt) => {
     evt.target.disabled = true;
 
-    const newPointEntity = new TripPointEntity(tripPointsEntities.dataForNewTripPoint);
+    const newPointEntity = new PointEntity(tripPointsEntities.dataForNewTripPoint);
     const editTripPointNew = new PointEdit(newPointEntity);
-
-    // getNewPoint(newPointEntity);
-
 
     tripPointsContainer.insertBefore(editTripPointNew.render(), tripPointsContainer.querySelector(`.trip-day`));
 
@@ -115,13 +102,12 @@ api.getPoints()
       return tripPointsEntities.add(newData)
         .then((response) => {
           // console.log(response);
-          const newTripPointNewEntity = new TripPointEntity(response);
+          const newTripPointNewEntity = new PointEntity(response);
           // const newTripPoint = new TripPoint(tripPointNewEntity);
           // console.log(newTripPointNewEntity);
           // console.log(tripPointsEntities);
           tripPointsEntities.data.push(newTripPointNewEntity);
 
-          // renderTripPoints(tripPointsEntities);
           renderPoints(tripPointsEntities);
           updateGeneralInfo(tripPointsEntities.generalInfo);
 
@@ -137,7 +123,6 @@ api.getPoints()
 
     // console.log(newPointEntity);
     // console.log(editTripPointNew);
-    // editTripPointNew.render();
 
   });
 })

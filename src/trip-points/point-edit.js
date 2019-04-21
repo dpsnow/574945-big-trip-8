@@ -6,7 +6,7 @@ import {isFunction, createElement, renderElements} from '../utils/utils.js';
 import {Component} from '../component.js';
 import {createOffers, getTemplate} from './templates/point-edit-template.js';
 
-import {ESC_KEYCODE, typeTripPoint, Destinations} from './trip-point-constants.js';
+import {ESC_KEYCODE, typeTripPoint, Destinations} from '../trip-constants.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import '../../node_modules/flatpickr/dist/themes/material_green.css';
@@ -31,12 +31,6 @@ class PointEdit extends Component {
     this._flatpickrDay = null;
 
     this._icon = data.icon;
-
-    // this._day = data.day;
-
-    // this._allOffers = data.allOffers;
-    // this._description = data.description;
-    // this._picture = data.picture;
 
     this._isNewTripPoint = data.isNewTripPoint;
 

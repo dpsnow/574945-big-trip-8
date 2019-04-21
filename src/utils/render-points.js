@@ -2,7 +2,7 @@ import {DayTrip} from '../day-trip/day-trip.js';
 
 import {Point} from '../trip-points/point.js';
 import {PointEdit} from '../trip-points/point-edit.js';
-import {TypeInfo} from '../trip-points/trip-point-constants.js';
+import {TypeInfo} from '../trip-constants.js';
 
 import {formatDate, renderElements, cleanNode} from './utils.js';
 import {updateGeneralInfo} from './update-general-info.js';
@@ -18,8 +18,6 @@ const getPoints = (entitiesTripPoints) => {
   const points = [];
 
   let dayTrip;
-
-  // entitiesTripPoints.sort(stateSort);
 
   // console.log(`fn renderTripPoints (tripPointsData = `, entitiesTripPoints);
 
@@ -37,7 +35,6 @@ const getPoints = (entitiesTripPoints) => {
 
     if (dayTrip !== currentDay) {
       oneDayTrip = new DayTrip(currentDay, formatDate(currentDate, `DD MMM`));
-      // oneDayTripPoint = new DayTrip(currentDay, moment(currentDate).format('DD MMM'));
       oneDayTrip.render();
       dayTrip = currentDay;
     }
@@ -58,11 +55,7 @@ const getPoints = (entitiesTripPoints) => {
         tripPoint.render();
         oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
         editTripPoint.unrender();
-
-        // isEditMode = false;
-
         edtingMode = null;
-
       };
 
       editTripPoint.onSubmit = (newData) => {
@@ -72,16 +65,7 @@ const getPoints = (entitiesTripPoints) => {
               entitiesTripPoints.data[i].update(updatedData);
 
               tripPoint.update(entitiesTripPoints.data[i]);
-
-              // ?????? ?????? ??? ????????? ?????????? ???
-              // tripPoint.render();
-              // oneDayItems.replaceChild(tripPoint.element, editTripPoint.element);
-              // editTripPoint.unrender();
-
-
-              // ????????? ??? ????? ?????? ??????, ??-?? ???? ??? ????? ????????? ????????? ??? ???????????
               // console.log('entitiesTripPoints', entitiesTripPoints);
-              // renderTripPoints(entitiesTripPoints);
               renderPoints(entitiesTripPoints);
 
               updateGeneralInfo(entitiesTripPoints.generalInfo);
@@ -96,13 +80,8 @@ const getPoints = (entitiesTripPoints) => {
             .then(() => {
               // console.log(' entitiesTripPoints.update', updatedData);
               delete entitiesTripPoints.data[i];
-              // editTripPoint.unrender();
               updateGeneralInfo(entitiesTripPoints.generalInfo);
-
-              // ????????? ???
-              // renderTripPoints(entitiesTripPoints);
               renderPoints(entitiesTripPoints);
-
               edtingMode = null;
             });
       };
@@ -123,7 +102,6 @@ const getPoints = (entitiesTripPoints) => {
       };
 
       tripPoint.onAddOffer = () => {
-        // tripPoint.update(entitiesTripPoints[i]);
         // console.log(`updateDate [${i}]`);
 
         return entitiesTripPoints.update(tripPoint.toRaw)

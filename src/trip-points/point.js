@@ -1,7 +1,7 @@
 import {isFunction, formatDate} from '../utils/utils.js';
 import {Component} from '../component.js';
 import {getTemplate} from './templates/point-template.js';
-import {Destinations} from './trip-point-constants.js';
+import {Destinations} from '../trip-constants.js';
 
 class Point extends Component {
   constructor(data) {
@@ -77,31 +77,6 @@ class Point extends Component {
 
   _onClickOffer(evt) {
     evt.preventDefault();
-    // const promise = new Promise((resolve, reject) => {
-    //   let targetOffer = evt.target.innerText;
-    //   targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + €`));
-
-    //   this._offers.forEach((offer) => {
-    //     if (offer.title === targetOffer) {
-    //       offer.accepted = true;
-    //     }
-    //   });
-
-    //   if (isFunction(this._onAddOffer)) {
-    //     this._onAddOffer();
-    //   }
-    // });
-
-    // promise
-    // .then(() => {
-    //   this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
-    //   evt.target.remove();
-    // })
-    // .catch(() => {
-    //   console.log('ошибка при выполнение _onAddOffer');
-    //   this.element.classList.add(`shake`);
-    // });
-
 
     // console.log(`Добавить оффер {${evt.target.innerText}} и обновить цену и отправить запрос на сервер`);
     this._element.classList.toggle(`shake`, false);
@@ -117,8 +92,6 @@ class Point extends Component {
 
 
     if (isFunction(this._onAddOffer)) {
-      // this._onAddOffer(evt.target);
-
       this._onAddOffer(evt.target)
         .then(() => {
           this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
@@ -130,9 +103,6 @@ class Point extends Component {
           this.element.classList.add(`shake`);
         });
     }
-
-    // this.element.querySelector(`.trip-point__price`).textContent = `€ ${this._totalPrice}`;
-    // evt.target.remove();
   }
 
   bind() {
