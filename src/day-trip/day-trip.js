@@ -3,7 +3,6 @@ import {getTemplate} from './day-trip-template.js';
 
 class DayTrip extends Component {
   constructor(day, date) {
-  // console.log(day, date);
     super();
     this.day = day;
     this.date = date;

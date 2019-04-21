@@ -5,7 +5,6 @@ import {CURRENCY, Destinations} from '../trip-constants.js';
 
 class Point extends Component {
   constructor(data) {
-    // console.log('in TripPoint', data);
     super();
     this._id = data.id;
     this._timeStart = data.timeStart;
@@ -47,7 +46,6 @@ class Point extends Component {
     this._onAddOffer = fn;
   }
 
-
   get toRaw() {
     return {
       'base_price': this._price,
@@ -77,19 +75,14 @@ class Point extends Component {
 
   _onClickOffer(evt) {
     evt.preventDefault();
-
-    // console.log(`Добавить оффер {${evt.target.innerText}} и обновить цену и отправить запрос на сервер`);
     this._element.classList.toggle(`shake`, false);
-
     let targetOffer = evt.target.innerText;
     targetOffer = targetOffer.slice(0, targetOffer.lastIndexOf(` + ${CURRENCY}`));
-
     this._offers.forEach((offer) => {
       if (offer.title === targetOffer) {
         offer.accepted = true;
       }
     });
-
 
     if (isFunction(this._onAddOffer)) {
       this._onAddOffer(evt.target)
@@ -98,8 +91,6 @@ class Point extends Component {
           evt.target.remove();
         })
         .catch(() => {
-          // console.error(error);
-          // console.log('ошибка при выполнение _onAddOffer');
           this.element.classList.add(`shake`);
         });
     }
@@ -124,10 +115,8 @@ class Point extends Component {
     this._icon = newData.icon;
     this._type = newData.type;
     this._destination = newData.destination.name;
-
     this._timeStart = newData.timeStart;
     this._timeEnd = newData.timeEnd;
-
     this._price = newData.price;
     this._totalPrice = newData.totalPrice;
     this._offers = newData.offers;

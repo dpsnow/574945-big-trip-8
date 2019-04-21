@@ -78,7 +78,6 @@ let typeTripPoint = {
   },
 };
 
-
 api.getOffers()
 .then((inputOffers) => {
   inputOffers.forEach((it) => {
@@ -93,19 +92,14 @@ api.getOffers()
 
   });
 });
-// .then(() => console.log('typeTripPoint', typeTripPoint));
-
 
 api.getDestinations()
 .then((inputDestinations) => {
-  // console.log('inputDestinations', inputDestinations);
   inputDestinations.forEach((it) => {
     Destinations[it.name] = {};
     Destinations[it.name].description = it.description;
     Destinations[it.name].pictures = it.pictures;
   });
 });
-// .then(() => console.log('Destinations', Destinations));
-
 
 export {AUTHORIZATION, END_POINT, ESC_KEYCODE, CURRENCY, NameFilter, filtersData, typeTripPoint, Destinations, TypeStats, TypeSort, TypeInfo, MsgStatus};

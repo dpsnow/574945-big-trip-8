@@ -689,6 +689,10 @@ input[type=radio]:checked + .trip-sorting__item {
   margin-bottom: 20px;
 }
 
+.point {
+  max-width: 935px;
+}
+
 .trip__points {
   margin-right: 30px;
   margin-bottom: 20px;
